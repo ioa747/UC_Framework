@@ -43,3 +43,37 @@ Ideas for new controls to be integrated into the library.
 
 ![GUI with UC_Framework](UC_Framework/UC/Assets/260527-120731-420_AutoIt3_6dpJp.gif)
 
+### Folder PATH listing for volume Data
+PROJECT
+│   Example1.au3
+│   
+└───UC_Framework
+    │   UC_Framework.au3
+    │   
+    └───UC
+        │   UC_Button.au3
+        │   UC_HourMinute.au3
+        │   UC_Image.au3
+        │   UC_InfoBox.au3
+        │   UC_Label.au3
+        │   UC_Link.au3
+        │   UC_ProgressBar.au3
+        │   UC_RadialProgress.au3
+        │   UC_Rating.au3
+        │   UC_Slider.au3
+        │   UC_Toggle.au3
+        │   
+        ├───Assets
+        │       116386-ioa747.png
+        │       1272.png
+        │       260527-120731-420_AutoIt3_6dpJp.gif
+        │       
+        └───Frame
+                UC_Frame.au3
+                UC_Frame_GDI.au3
+                UC_Frame_Generic.au3
+                UC_Frame_Internal.au3
+                UC_Frame_Map.au3
+                UC_Frame_Timers.au3
+                UC_Frame_WinAPI.au3
+                
