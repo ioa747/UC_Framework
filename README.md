@@ -43,6 +43,128 @@ Ideas for new controls to be integrated into the library.
 
 ![GUI with UC_Framework](UC_Framework/UC/Assets/260527-120731-420_AutoIt3_6dpJp.gif)
 
+---
+
+### worth noting
+
+now you call UC_Framework with
+```Autoit
+#include "UC_Framework\UC_Framework.au3"
+```
+
+which functions as a **Central Manifest**, because
+
+```Autoit
+#include-once
+
+;----------------------------------------------------------------------------------------
+; Title...........: UC_Framework.au3
+; Description.....: Universal Controls framework for custom GDI+ controls (Toggles, Sliders, etc.)
+; Link............: https://github.com/ioa747/UC_Framework
+; Link............: https://www.autoitscript.com/forum/topic/213667-uc_framework-universal-controls/
+;----------------------------------------------------------------------------------------
+
+#include "UC\Frame\UC_Frame.au3"
+
+#Region ; ~~~~~~~~~~~~~ Components ~~~~~~~~~~~~~
+#include "UC\UC_Toggle.au3"
+#include "UC\UC_Slider.au3"
+#include "UC\UC_Button.au3"
+#include "UC\UC_Link.au3"
+;~ #include "UC\UC_Label.au3"
+;~ #include "UC\UC_Image.au3"
+;~ #include "UC\UC_ProgressBar.au3"
+;~ #include "UC\UC_RadialProgress.au3"
+;~ #include "UC\UC_HourMinute.au3"
+;~ #include "UC\UC_Rating.au3"
+#include "UC\UC_InfoBox.au3"
+#EndRegion ; ~~~~~~~~~~~~~ Components ~~~~~~~~~~~~~
+```
+
+The **`UC_Framework.au3`** file acts as your central configuration hub.  
+Keep your compiled script lean by loading only the components you need.
+
+Now **each new control** is a **standalone udf**  
+which will be placed in the folder  ' **\UC_Framework\UC\**'  
+and you add a reference here in **UC_Framework.au3**
+
+Now each new control does **not need** to be imported into **__UC_Main_MsgHandler**  function. 
+
+Now configure this with the **Registered Event Handlers** in the maps,  
+thus allowing the use of only the Events that the control needs.
+
+```Autoit
+	Local $m[]
+	; Universal Properties
+	$m.UC_Type = $UC_TYPE_INFOBOX
+	$m.UC_ControlID = $idDummy
+	$m.UC_hWnd = $hChild
+	$m.UC_hParent = $hParent
+
+	; Registered Event Handlers
+	$m["UC_WM_" & $WM_LBUTTONDOWN] = "_WM_LBUTTONDOWN"
+	$m["UC_WM_" & $WM_LBUTTONDBLCLK] = "_WM_LBUTTONDBLCLK"
+	$m["UC_WM_" & $WM_LBUTTONUP] = "_WM_LBUTTONUP"
+;~ 	$m["UC_WM_" & $WM_RBUTTONDOWN] = "_WM_RBUTTONDOWN"
+;~ 	$m["UC_WM_" & $WM_RBUTTONUP] = "_WM_RBUTTONUP"
+	$m["UC_WM_" & $WM_MOUSEMOVE] = "_WM_MOUSEMOVE"
+	$m["UC_WM_" & $WM_SETFOCUS] = "_WM_SETFOCUS"
+	$m["UC_WM_" & $WM_KEYDOWN] = "_WM_KEYDOWN"
+```
+
+which correspond to the corresponding functions
+
+```Autoit
+Func _UC_InfoBox_WM_LBUTTONDOWN($idDummy, $hWnd, $iX, $iY)
+Func _UC_InfoBox_WM_LBUTTONDBLCLK($idDummy, $hWnd, $iX, $iY)
+Func _UC_InfoBox_WM_LBUTTONUP($idDummy, $hWnd, $iX, $iY)
+Func _UC_InfoBox_WM_MOUSEMOVE($idDummy, $hWnd, $iX, $iY)
+Func _UC_InfoBox_WM_SETFOCUS($idDummy, $hWnd, $iX, $iY)
+Func _UC_InfoBox_WM_KEYDOWN($idDummy, $hWnd, $iKeyCode, $aXY)
+```
+
+The only **modification** that needs to be made to **UC_Framework** is to "**\UC_Framework\UC\Frame\UC_Frame_Generic.au3**"  
+which needs to be imported into the **Global Enum** and into **$aUC_Types**    (making sure they have the same index)
+
+
+
+```Autoit
+Global Enum _
+		$UC_TYPE_NONE, _
+		$UC_TYPE_TOGGLE, _
+		$UC_TYPE_SLIDER, _
+		$UC_TYPE_BUTTON, _
+		$UC_TYPE_LINK, _
+		$UC_TYPE_LABEL, _
+		$UC_TYPE_IMAGE, _
+		$UC_TYPE_PROGRESSBAR, _
+		$UC_TYPE_RADIALPROGRESS, _
+		$UC_TYPE_HOURMINUTE, _
+		$UC_TYPE_RATING, _
+		$UC_TYPE_INFOBOX, _
+		$UC_TYPE_MAX
+
+Global Const $aUC_Types[] = [ _
+    "None", _             ; $UC_TYPE_NONE
+    "Toggle", _           ; $UC_TYPE_TOGGLE
+    "Slider", _           ; $UC_TYPE_SLIDER
+    "Button", _           ; $UC_TYPE_BUTTON
+    "Link", _             ; $UC_TYPE_LINK
+    "Label", _            ; $UC_TYPE_LABEL
+    "Image", _            ; $UC_TYPE_IMAGE
+    "ProgressBar", _      ; $UC_TYPE_PROGRESSBAR
+    "RadialProgress", _   ; $UC_TYPE_RADIALPROGRESS
+    "HourMinute", _       ; $UC_TYPE_HOURMINUTE
+	"Rating", _           ; $UC_TYPE_RATING
+	"InfoBox" _           ; $UC_TYPE_INFOBOX
+]
+```
+
+The system will automatically link your  
+**_UC_[Type]_Draw** and **_UC_[Type]_WM_[Event]** functions without modifying the core engine.
+
+---
+
 ### Folder PATH listing for volume Data
 
 ```
