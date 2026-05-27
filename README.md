@@ -1,7 +1,10 @@
 # UC_Framework
 Universal Controls framework for custom GDI+ controls (Toggles, Sliders, etc.)
 
+---
 
+
+<img src="UC_Framework/UC/Assets/116386-ioa747.png" width="100" alt="ioa747">
 Hi everyone,
 
 I'd like to share a project I've been working on: **UC\_Framework**. 
