@@ -112,7 +112,7 @@ Func __UC_CallControlFunc($iMsg, $id, $hWnd, $iX, $iY)
     Local $m = _UC_Properties($id)
     Local $sKey = "UC_WM_" & $iMsg
 
-    ; Ελέγχουμε αν το Control έχει δηλώσει υποστήριξη για αυτό το συγκεκριμένο μήνυμα
+    ; We check if Control has declared support for this specific message
     If MapExists($m, $sKey) And $m[$sKey] Then
         Local $sEventName = $m[$sKey] ; π.χ. "_WM_LBUTTONDOWN"
         Local $sFuncName = "_UC_" & $aUC_Types[$m.UC_Type] & $sEventName
@@ -127,7 +127,7 @@ Func __UC_CallControlFunc($iMsg, $id, $hWnd, $iX, $iY)
         Return $vRet
     EndIf
 
-    Return $GUI_RUNDEFMSG ; Default επιστροφή αν δεν υπάρχει handler
+    Return $GUI_RUNDEFMSG ; Default return if there is no handler
 EndFunc
 
 Func __UC_ParentColor($hWnd)
@@ -157,3 +157,4 @@ Func __DW($sString, $iErrorNoLineNo = 1, $iLine = @ScriptLineNumber, $iError = @
 	Return SetError($iError, $iExtended, $iReturn)
 EndFunc   ;==>__DW
 #EndRegion ; ~~~~~~~~~~~~~ UC_Framework Internal Functions ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+

@@ -3,20 +3,14 @@
 
 #include "UC_Frame.au3"
 
-;~ #include <AutoItConstants.au3>
-;~ #include <GDIPlus.au3>
 #include <GUIConstantsEx.au3>
 #include <WindowsConstants.au3>
 #include <WinAPISysWin.au3>
 #include <WinAPISys.au3>
-;~ #include <Misc.au3>
 #include <WinAPIGdi.au3>
-;~ #include <WindowsNotifsConstants.au3>
 #include <StaticConstants.au3>
 #include <String.au3>
-;~ #include <Array.au3>
 #include <WinAPIvkeysConstants.au3>
-;~ #include <Timers.au3>
 
 Global $g_UC_DebugInfo = 1
 
