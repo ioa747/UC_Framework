@@ -1,5 +1,12 @@
-; UC_Framework.au3
 #include-once
+
+;----------------------------------------------------------------------------------------
+; Title...........: UC_Framework.au3
+; Description.....: Universal Controls framework for custom GDI+ controls (Toggles, Sliders, etc.)
+; Link............: https://github.com/ioa747/UC_Framework
+; Link............: https://www.autoitscript.com/forum/topic/213667-uc_framework-universal-controls/
+;----------------------------------------------------------------------------------------
+
 #include "UC\Frame\UC_Frame.au3"
 
 #Region ; ~~~~~~~~~~~~~ Components ~~~~~~~~~~~~~

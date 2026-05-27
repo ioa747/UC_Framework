@@ -1,9 +1,10 @@
-; https://www.autoitscript.com/forum/topic/213667-uc_framework-universal-controls/
+﻿; https://www.autoitscript.com/forum/topic/213667-uc_framework-universal-controls/
 ;----------------------------------------------------------------------------------------
 ; Title...........: Example1.au3
 ; Description.....: Example of using the UC_Framework.au3
-; AutoIt Version..: 3.3.18.0   Author: ioa747           Script Version: 0.0.10.0
+; AutoIt Version..: 3.3.18.0   Author: ioa747           Script Version: 0.0.11.0
 ; Note............: Testet in Windows 11 Pro 25H2       Date:22/05/2026
+; Link............: https://github.com/ioa747/UC_Framework
 ;----------------------------------------------------------------------------------------
 #AutoIt3Wrapper_Au3Check_Parameters=-d -w 1 -w 2 -w 3 -w 4 -w 5 -w 6 -w 7
 
