@@ -4,7 +4,7 @@ Universal Controls framework for custom GDI+ controls (Toggles, Sliders, etc.)
 
 Hi everyone,
 
-I'd like to share a project I've been working on: **UC\_Framework**.  
+I'd like to share a project I've been working on: **UC\_Framework**. 
 It is a lightweight framework designed to create modern, reactive, and highly customizable **GDI+ controls** for AutoIt.
 
 My goal was to create a standardized, extensible way to introduce custom controls into AutoIt, moving away from static functions  
@@ -37,3 +37,6 @@ This framework is currently in its **early stages (Alpha)**.
 I am sharing it now because I want to establish a solid foundation and gather feedback on the architecture.
 
 Ideas for new controls to be integrated into the library.
+
+![GUI with UC_Framework](resources/260527-120731-420_AutoIt3_6dpJp.gif)
+
