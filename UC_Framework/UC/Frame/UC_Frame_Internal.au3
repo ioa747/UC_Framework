@@ -114,7 +114,7 @@ Func __UC_CallControlFunc($iMsg, $id, $hWnd, $iX, $iY)
 
     ; We check if Control has declared support for this specific message
     If MapExists($m, $sKey) And $m[$sKey] Then
-        Local $sEventName = $m[$sKey] ; π.χ. "_WM_LBUTTONDOWN"
+        Local $sEventName = $m[$sKey] ; e.g. "_WM_LBUTTONDOWN"
         Local $sFuncName = "_UC_" & $aUC_Types[$m.UC_Type] & $sEventName
 
         Local $vRet = Call($sFuncName, $id, $hWnd, $iX, $iY)

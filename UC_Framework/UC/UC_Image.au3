@@ -1,4 +1,4 @@
-; UC_Button.au3
+; UC_Image.au3
 #include-once
 
 #include "Frame\UC_Frame.au3"
