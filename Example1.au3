@@ -1,4 +1,4 @@
-﻿; https://www.autoitscript.com/forum/topic/213667-uc_framework-universal-controls/
+; https://www.autoitscript.com/forum/topic/213667-uc_framework-universal-controls/
 ;----------------------------------------------------------------------------------------
 ; Title...........: Example1.au3
 ; Description.....: Example of using the UC_Framework.au3
@@ -62,7 +62,7 @@ Func _Main()
     _UC_Set(-1, "ShowTooltip", 1)
 
     ; === Image ===
-    Local $iWidth, $sImage = @ScriptDir & "\1272.png"
+    Local $iWidth, $sImage = @ScriptDir & "\UC_Framework\UC\Assets\1272.png"
     Local $idImage1 = _UC_Image_Create($hMainGui, $sImage, 10, 300, 0.6)
     $iWidth = _UC_Get(-1, "Width")
     Local $idImage2 = _UC_Image_Create($hMainGui, $sImage, 10 + $iWidth, 300, 0.4)
