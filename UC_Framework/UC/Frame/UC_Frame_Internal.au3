@@ -208,35 +208,39 @@ EndFunc   ;==>__DW
 
 #Region ; ~~~~~~~~~~~~~ UC_Themes Functions for Theme Management ~~~~~~~~~~~~~~~~~
 Func _UC_CreateDefaultIni($sIniPath)
-	Local $sTxt = ""
-	$sTxt &= "[ThemeConfig]" & @CRLF
-	$sTxt &= "Default=auto" & @CRLF
-	$sTxt &= "DefaultLight= Light" & @CRLF
-	$sTxt &= "DefaultDark=Dark" & @CRLF
-	$sTxt &= "[Light]" & @CRLF
-	$sTxt &= "Themes_Name=Light" & @CRLF
-	$sTxt &= "Themes_IsLightColor=1" & @CRLF
-	$sTxt &= "Surface_Face=0xF0F0F0" & @CRLF
-	$sTxt &= "Surface_Hot=0x0066CC" & @CRLF
-	$sTxt &= "Surface_Border=0xABABAB" & @CRLF
-	$sTxt &= "Surface_Disabled = 0xD8D8D8" & @CRLF
-	$sTxt &= "Text_fore=0x000000" & @CRLF
-	$sTxt &= "Text_Back=0xFFFFFF" & @CRLF
-	$sTxt &= "Fonts_Name=Segoe UI" & @CRLF
-	$sTxt &= "Fonts_Size=9" & @CRLF
-	$sTxt &= "Fonts_Weight=400" & @CRLF
-	$sTxt &= "[Dark]" & @CRLF
-	$sTxt &= "Themes_Name=Dark" & @CRLF
-	$sTxt &= "Themes_IsLightColor=0" & @CRLF
-	$sTxt &= "Text_fore=0xFFFFFF" & @CRLF
-	$sTxt &= "Text_Back=0x1E1E1E" & @CRLF
-	$sTxt &= "Surface_Face=0x2D2D2D" & @CRLF
-	$sTxt &= "Surface_Hot=0x3399FF" & @CRLF
-	$sTxt &= "Surface_Border=0x454545" & @CRLF
-	$sTxt &= "Surface_Disabled = 0x8D8D8D" & @CRLF
-	$sTxt &= "Fonts_Name=Segoe UI" & @CRLF
-	$sTxt &= "Fonts_Size=9" & @CRLF
-	$sTxt &= "Fonts_Weight=400"
+    Local $sTxt = ""
+    $sTxt &= "[ThemeConfig]" & @CRLF
+    $sTxt &= "Default=auto" & @CRLF
+    $sTxt &= "DefaultLight= Light" & @CRLF
+    $sTxt &= "DefaultDark=Dark" & @CRLF
+    $sTxt &= "[Light]" & @CRLF
+    $sTxt &= "Themes_Name=Light" & @CRLF
+    $sTxt &= "Themes_IsLightColor=1" & @CRLF
+    $sTxt &= "Themes_Workspace=0x758184" & @CRLF
+    $sTxt &= "Themes_Accent=0x388692" & @CRLF
+    $sTxt &= "Surface_Face=0xF0F0F0" & @CRLF
+    $sTxt &= "Surface_Hot=0x0066CC" & @CRLF
+    $sTxt &= "Surface_Border=0xABABAB" & @CRLF
+    $sTxt &= "Surface_Disabled=0xD8D8D8" & @CRLF
+    $sTxt &= "Text_fore=0x000000" & @CRLF
+    $sTxt &= "Text_Back=0xFFFFFF" & @CRLF
+    $sTxt &= "Fonts_Name=Segoe UI" & @CRLF
+    $sTxt &= "Fonts_Size=9" & @CRLF
+    $sTxt &= "Fonts_Weight=400" & @CRLF
+    $sTxt &= "[Dark]" & @CRLF
+    $sTxt &= "Themes_Name=Dark" & @CRLF
+    $sTxt &= "Themes_IsLightColor=0" & @CRLF
+    $sTxt &= "Themes_Workspace=0x758184" & @CRLF
+    $sTxt &= "Themes_Accent=0x388692" & @CRLF
+    $sTxt &= "Surface_Face=0x2D2D2D" & @CRLF
+    $sTxt &= "Surface_Hot=0x3399FF" & @CRLF
+    $sTxt &= "Surface_Border=0x454545" & @CRLF
+    $sTxt &= "Surface_Disabled=0x8D8D8D" & @CRLF
+    $sTxt &= "Text_fore=0xFFFFFF" & @CRLF
+    $sTxt &= "Text_Back=0x1E1E1E" & @CRLF
+    $sTxt &= "Fonts_Name=Segoe UI" & @CRLF
+    $sTxt &= "Fonts_Size=9" & @CRLF
+    $sTxt &= "Fonts_Weight=400"
 
 	FileWrite($sIniPath, $sTxt)
 EndFunc   ;==>_UC_CreateDefaultIni
