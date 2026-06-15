@@ -3,6 +3,8 @@
 
 #include "UC_Frame.au3"
 
+
+#CS
 #include <GUIConstantsEx.au3>
 #include <WindowsConstants.au3>
 #include <WinAPISysWin.au3>
@@ -12,7 +14,7 @@
 #include <String.au3>
 #include <WinAPIvkeysConstants.au3>
 
-Global $g_UC_DebugInfo = 1
+Global $g_UC_DebugInfo = 0
 
 Global Enum _
 		$UC_TYPE_NONE, _
@@ -44,19 +46,24 @@ Global Const $aUC_Types[] = [ _
 	"InfoBox" _           ; $UC_TYPE_INFOBOX
 ]
 
+#CE
+
 #Region ; ~~~~~~~~~~~~~ UC_Framework Generic API ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 Func _UC_Redraw($hWnd)
-    Local $id = _WinAPI_GetProp($hWnd, "UC_ControlID")
+    Local $id = Int(_WinAPI_GetProp($hWnd, "UC_ControlID"))
     If Not $id Then Return SetError(1, 0, 0)
-    Local $m = _UC_Properties($id)
+    Local $m = _UC_Properties($id, Default, Default, "UC_Frame_Generic.au3")
 
     If $m.UC_Type = $UC_TYPE_NONE Then Return
 
     ; Creating the function name
     Local $sDrawFunc = "_UC_" & $aUC_Types[$m.UC_Type] & "_Draw"
 
+	__DW("_UC_Redraw :: UC_ControlID=" & $m.UC_ControlID & ", $sDrawFunc=" & $sDrawFunc & @CRLF, 1, "### UC_Frame_Generic.au3")
+
     Call($sDrawFunc, $hWnd, $m)
     If @error = 0xDEAD And @extended = 0xBEEF Then __DW("!Error: Function " & $sDrawFunc & " was not found for Control ID: " & $id)
+;~ 	_UC_Properties($id, $m, False) ; update the $m
 EndFunc
 
 ; #FUNCTION# ====================================================================================================================
@@ -69,6 +76,10 @@ EndFunc
 ;                               If $vName is "@Delete", set $vVal to True to skip final redraw.
 ;                               If $vName is a Map, $vVal=False skips the automatic redraw.
 ; Return values .: Success:
+;                   0.1. GET Full Array:  (Call: _UC_Properties()) -> Returns the entire $aProp Array.
+;                   0.1. GET Full Map:    (Call: _UC_Properties(-1)) -> $aProp[1].UC_LastCreatedID -> Returns the UC_LastCreatedID map.
+;                   0.1. GET Value:       (Call: _UC_Properties(-1, "UC_Type")) -> Returns the UC_TYPE from UC_LastCreatedID e.g.: $UC_TYPE_TOGGLE
+;
 ;                   1. GET Full Map:  (Call: _UC_Properties($id)) -> Returns the entire Map object.
 ;                   2. SET Full Map:  (Call: _UC_Properties($id, $mMap)) -> Returns 1, updates memory and Redraws.
 ;                   3. GET Value:     (Call: _UC_Properties($id, "PropName")) -> Returns the specific value.
@@ -94,16 +105,16 @@ EndFunc
 ;                  - Memory Management: Map objects are heavy. Always call with "@Delete" when a control is
 ;                    destroyed (e.g., during GUIDelete) to prevent memory leaks in long-running scripts.
 ; ===============================================================================================================================
-Func _UC_Properties($idDummy = Default, $vName = Default, $vVal = Default)
+Func _UC_Properties($idDummy = Default, $vName = Default, $vVal = Default, $iFromfile = "??", $iFromLine = @ScriptLineNumber)
 	Local Static $aProp[1] = [0], $mMap[]
 
 	If $idDummy = Default Then Return $aProp
-	If $idDummy = -1 Then
+	If $idDummy = -1 Then  ; -1 => UC_LastCreatedID
 		If Not MapExists($aProp[1], "UC_LastCreatedID") Then Return SetError(2, 0, 0)
 		$idDummy = $aProp[1].UC_LastCreatedID
 	EndIf
 
-	; Dynamic Resize
+	; Dynamic Array Resize
 	If $idDummy > $aProp[0] Then
 		Local $iNewSize = $idDummy + 10
 		ReDim $aProp[$iNewSize]
@@ -118,6 +129,10 @@ Func _UC_Properties($idDummy = Default, $vName = Default, $vVal = Default)
 
 	EndIf
 
+;~ 	__DW("_UC_Properties(" & $vID & ", " &  (IsMap($vName) ? "{" & VarGetType($vName) & "[" & UBound($vName) & "]}" : $vName)  & ", " &  $vVal  & ", " &  $iFrom  & ")" & @CRLF)
+
+	__DW("_UC_Properties(" & $idDummy & ", " &  (IsMap($vName) ? "{" & VarGetType($vName) & "[" & UBound($vName) & "]}" : $vName)  & ", " &  $vVal  & ") <-(" & $iFromfile &":"& $iFromLine & ")-<" & @CRLF, 1, "+++ UC_Frame_Generic.au3")
+
 	; Map Selection (or Template)
 	Local $m = (IsMap($aProp[$idDummy]) ? $aProp[$idDummy] : $mMap)
 
@@ -127,7 +142,10 @@ Func _UC_Properties($idDummy = Default, $vName = Default, $vVal = Default)
 
 		Case IsMap($vName)
 			$aProp[$idDummy] = $vName ; SET MAP
-			If $vVal = Default And MapExists($vName, "UC_hWnd") Then _UC_Redraw($vName.UC_hWnd)
+			If $vVal = Default And MapExists($vName, "UC_hWnd") Then
+				__DW("_UC_Properties :: (1) >>> _UC_Redraw" & @CRLF, 1, "+++ UC_Frame_Generic.au3")
+				_UC_Redraw($vName.UC_hWnd)
+			EndIf
 			Return 1
 
 		Case Else
@@ -140,13 +158,18 @@ Func _UC_Properties($idDummy = Default, $vName = Default, $vVal = Default)
 			Else ; SET Val
 				If $vName = "@Delete" Then
 					$aProp[$idDummy] = ""
-					If $vVal = Default Then _UC_Redraw($m.UC_hWnd)
+					; If $vVal = Default And MapExists($vName, "UC_hWnd") Then _UC_Redraw($m.UC_hWnd)
 					Return 1
 				EndIf
 
 				$m[$vName] = $vVal
 				$aProp[$idDummy] = $m
-				_UC_Redraw($m.UC_hWnd)
+
+				; _UC_Redraw($m.UC_hWnd)
+				If MapExists($m, "UC_hWnd") Then
+					__DW("_UC_Properties :: (2) >>> _UC_Redraw" & @CRLF, 1, "+++ UC_Frame_Generic.au3")
+					_UC_Redraw($m.UC_hWnd)
+				EndIf
 				Return 1
 			EndIf
 	EndSelect
@@ -154,23 +177,24 @@ EndFunc   ;==>_UC_Properties
 
 Func _UC_Get($idCtrl = Default, $sProp = Default)
 	If $idCtrl = Default Then
-		$idCtrl = _UC_Properties(1, "UC_ActiveControlID")
+		$idCtrl = _UC_Properties(1, "UC_ActiveControlID", Default, "UC_Frame_Generic.au3")
 		If Not $idCtrl Then Return SetError(1, 0, 0)
-		If $sProp = Default Then Return $idCtrl
+		If $sProp = Default Then Return $idCtrl ; if no $sProp argum -> Return $idCtrl
 	EndIf
-	Return _UC_Properties($idCtrl, $sProp)
+	Return _UC_Properties($idCtrl, $sProp, Default, "UC_Frame_Generic.au3")
 EndFunc   ;==>_UC_Get
 
 Func _UC_Set($idCtrl = Default, $sProp = Default, $vValue = Default)
 	If $idCtrl = Default Then
-		$idCtrl = _UC_Properties(1, "UC_ActiveControlID")
+		$idCtrl = _UC_Properties(1, "UC_ActiveControlID", Default, "UC_Frame_Generic.au3")
 		If Not $idCtrl Then Return SetError(1, 0, 0)
-		If $sProp = Default Then Return $idCtrl
+		If $sProp = Default Then Return $idCtrl ; if no $sProp argum -> Return $idCtrl
 	EndIf
-	Return _UC_Properties($idCtrl, $sProp, $vValue)
+	Return _UC_Properties($idCtrl, $sProp, $vValue, "UC_Frame_Generic.au3")
 EndFunc   ;==>_UC_Set
 
 Func _UC_Destroy($hParent = Default, $idDummy = Default)
+	__DW("_UC_Destroy($hParent=" & $hParent & ", $idDummy=" & $idDummy & ")" & @CRLF, 1, ">>> UC_Frame_Generic.au3")
 
 	Local $m, $aAll = _UC_Properties(Default)
 
@@ -184,7 +208,7 @@ Func _UC_Destroy($hParent = Default, $idDummy = Default)
 					_WinAPI_RemoveProp($m.UC_hWnd, "UC_ControlID")
 					GUIDelete($m.UC_hWnd)
 				EndIf
-				_UC_Properties($i, "@Delete", True)
+				_UC_Properties($i, "@Delete", True, "UC_Frame_Generic.au3")
 			EndIf
 		Next
 		Return 1
@@ -199,7 +223,7 @@ Func _UC_Destroy($hParent = Default, $idDummy = Default)
 						If $m.UC_hParent = $hParent Then
 							_WinAPI_RemoveProp($m.UC_hWnd, "UC_ControlID")
 							GUIDelete($m.UC_hWnd)
-							_UC_Properties($i, "@Delete", True)
+							_UC_Properties($i, "@Delete", True, "UC_Frame_Generic.au3")
 						EndIf
 					EndIf
 				EndIf
@@ -214,7 +238,7 @@ Func _UC_Destroy($hParent = Default, $idDummy = Default)
 					_WinAPI_RemoveProp($m.UC_hWnd, "UC_ControlID")
 					GUIDelete($m.UC_hWnd)
 				EndIf
-				Return _UC_Properties($idDummy, "@Delete", True)
+				Return _UC_Properties($idDummy, "@Delete", True, "UC_Frame_Generic.au3")
 			EndIf
 		EndIf
 	EndIf
@@ -224,9 +248,33 @@ Func _UC_Refresh($hWnd)
 	Return _WinAPI_RedrawWindow($hWnd, 0, 0, BitOR($RDW_INVALIDATE, $RDW_UPDATENOW, $RDW_ALLCHILDREN))
 EndFunc   ;==>_UC_Refresh
 
-Func _UC_GUISetBkColor($iBkColor, $hWnd)
+Func _UC_GUISetBkColor000($iBkColor, $hWnd) ; 🚧
 	GUISetBkColor($iBkColor, $hWnd)
 	_WinAPI_SetProp($hWnd, "UC_GUIBkColor", $iBkColor)
+EndFunc   ;==>_UC_GUISetBkColor
+
+Func _UC_GUISetBkColor($iBkColor, $hWnd)
+	Local $iMsg = GUISetBkColor($iBkColor, $hWnd)
+	If $iMsg Then
+		_UC_Properties(1, "UC_GUIBkColor_" & $hWnd, $iBkColor, "UC_Frame_Generic.au3")
+
+		; Initialization (if not already done)
+		__UC_Framework_Init($hWnd)
+
+		; check what is set in [Themes] -> Default
+		Local $sDefault = _UC_Themes("ThemeConfig", "Default")
+
+		If $sDefault = "auto" Then
+			Local $sTarget = _UC_IsLightColor($iBkColor) ? _UC_Themes("ThemeConfig", "DefaultLight") : _UC_Themes("ThemeConfig", "DefaultDark")
+			_UC_Themes("Active", _UC_Themes($sTarget))
+		Else
+			_UC_Themes("Active", _UC_Themes($sDefault))
+		EndIf
+
+		; Trigger for Redraw on all controls in $hWnd
+		_UC_Refresh($hWnd)
+	EndIf
+	Return $iMsg
 EndFunc   ;==>_UC_GUISetBkColor
 
 Func _UC_GetContrastColor($iBkColor) ;, $iPrecent = 20) 🚧
@@ -279,7 +327,7 @@ EndFunc   ;==>_UC_SetCursor
 
 Func _UC_ToolTip($sText, $iX = -1, $iY = -1, $hParent = 0)
 	Local Static $hToolTipGUI = 0, $idLabel = 0, $idFrame = 0
-	Local $m = _UC_Properties(1) ; Retrieve global properties/settings context
+	Local $m = _UC_Properties(1, Default, Default, "UC_Frame_Generic.au3") ; Retrieve global properties/settings context
 
 	; Initialization (Run once)
 	If $hToolTipGUI = 0 Then
@@ -307,13 +355,15 @@ Func _UC_ToolTip($sText, $iX = -1, $iY = -1, $hParent = 0)
 
 		GUISetBkColor($m.UC_ToolTip_BkColor, $hToolTipGUI)
 		WinSetTrans($hToolTipGUI, "", $m.UC_ToolTip_Transparency)
+
+		GUISwitch($hParent) ; 🚧 test
 	EndIf
 
 	; Handle Hide State
 	If $sText == "" Then
 		If BitAND(WinGetState($hToolTipGUI), 2) Then GUISetState(@SW_HIDE, $hToolTipGUI)
 		$m.UC_ToolTip_Text = ""
-		_UC_Properties(1, $m, False) ; update the map
+		_UC_Properties(1, $m, False, "UC_Frame_Generic.au3") ; update the map
 		Return
 	EndIf
 
@@ -327,7 +377,7 @@ Func _UC_ToolTip($sText, $iX = -1, $iY = -1, $hParent = 0)
 	EndIf
 
 	$m.UC_ToolTip_Text = $sText   ; Update stored text
-	_UC_Properties(1, $m, False)  ; update the map
+	_UC_Properties(1, $m, False, "UC_Frame_Generic.au3")  ; update the map
 
 	; Dynamic Sizing Logic
 	Local $aTextSize = _UC_GetTextSize($sText, $m.UC_ToolTip_FontName, $m.UC_ToolTip_FontSize)
@@ -383,6 +433,24 @@ Func _UC_GetTextSize($sString, $sFont = "Segoe UI", $fFontSize = 9, $iFontStyle 
 
 	Return $aSize
 EndFunc   ;==>_UC_GetTextSize
+
+; Returns the maximum font size that fits within the given width and height ; 🚧
+Func _UC_GetFitFontSize($sText, $sFont, $fStartSize, $iMaxWidth, $iMaxHeight, $iFontStyle = 0)
+    Local $fFontSize = $fStartSize
+    Local $aSize
+
+    While $fFontSize > 4
+        $aSize = _UC_GetTextSize($sText, $sFont, $fFontSize, $iFontStyle)
+
+        ; Check if width or height exceeds the limits
+        If $aSize[0] > $iMaxWidth Or $aSize[1] > $iMaxHeight Then
+            $fFontSize -= 0.5 ; Decrease font size and try again
+        Else
+            ExitLoop ; It fits!
+        EndIf
+    WEnd
+    Return $fFontSize
+EndFunc
 
 Func _UC_IsMouseOver($hWnd)
 	Local $tPoint = _WinAPI_GetMousePos()

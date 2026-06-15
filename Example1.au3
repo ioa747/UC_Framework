@@ -14,9 +14,11 @@ _Main()
 
 Func _Main()
     Local $hMainGui = GUICreate("Universal Controls GUI", 580, 480, -1, -1, BitOR($WS_CLIPCHILDREN, $GUI_SS_DEFAULT_GUI))
+	ConsoleWrite("$hMainGui=" & $hMainGui & @CRLF)
     _UC_GUISetBkColor(0xF0F0F0, $hMainGui)
 
     Local $idLblTheme = GUICtrlCreateLabel("GUI Theme", 20, 10, 150, 17)
+	ConsoleWrite("$idLblTheme=" & $idLblTheme & @CRLF)
 
     ; === Toggles ===
     Local $idToggleTheme = _UC_Toggle_Create($hMainGui, 20, 30, 50, 25, 0, 0xF0F0F0, 0x758184, 0xD1D1D1)

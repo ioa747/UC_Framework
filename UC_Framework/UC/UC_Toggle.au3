@@ -4,7 +4,7 @@
 #include "Frame\UC_Frame.au3"
 
 #Region ; ~~~~~~~~~~~~~ UC Toggle API ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-Func _UC_Toggle_Create($hParent, $iX, $iY, $iW, $iH, $iType = 0, $hOnCol = 0x4CD964, $hOffCol = 0xD1D1D1, $hBtnCol = 0xFFFFFF)
+Func _UC_Toggle_Create($hParent, $iX, $iY, $iW, $iH, $iType = 0, $hOnCol = Default, $hOffCol = Default, $hBtnCol = Default)
 	GUISwitch($hParent)
 	Local $idDummy = GUICtrlCreateDummy()
 	Local $hChild = GUICreate("UC_Control_" & $idDummy, $iW, $iH, $iX, $iY, BitOR($WS_CHILD, $WS_VISIBLE, $WS_CLIPSIBLINGS, $WS_TABSTOP), $WS_EX_TRANSPARENT, $hParent)
@@ -20,6 +20,8 @@ Func _UC_Toggle_Create($hParent, $iX, $iY, $iW, $iH, $iType = 0, $hOnCol = 0x4CD
 	$m.UC_ControlID = $idDummy
 	$m.UC_hWnd = $hChild
 	$m.UC_hParent = $hParent
+	$m.UC_Width = $iW
+	$m.UC_Height = $iH
 
 	; Registered Event Handlers
 	$m["UC_WM_" & $WM_LBUTTONDOWN] = "_WM_LBUTTONDOWN"
@@ -40,19 +42,27 @@ Func _UC_Toggle_Create($hParent, $iX, $iY, $iW, $iH, $iType = 0, $hOnCol = 0x4CD
 	$m.BtnColor = $hBtnCol ; Color of the Thumb button
 
 	_WinAPI_SetProp($hChild, "UC_ControlID", $idDummy)
-	_UC_Properties($idDummy, $m)
-	_UC_Properties(1, "UC_LastCreatedID", $idDummy)
+	_UC_Properties($idDummy, $m, Default, "UC_Toggle.au3") ; ℹ️ Default trigger redraw
+	_UC_Properties(1, "UC_LastCreatedID", $idDummy, "UC_Toggle.au3")
 
 	GUISwitch($hParent)
 	Return $idDummy
 EndFunc   ;==>_UC_Toggle_Create
 
 Func _UC_Toggle_Draw($hWnd, ByRef $m)
+	Local $mTheme = _UC_Themes("Active")
+
+;~ 	; Theme-Aware Resolution
+	Local $iBgColor = ($m.Value ? ($m.OnColor == Default ? $mTheme.Themes_Accent : $m.OnColor) : ($m.OffColor == Default ? $mTheme.Themes_Accent : $m.OffColor))
+
+	Local $iBtnColor = ($m.BtnColor == Default ? $mTheme.Surface_Face : $m.BtnColor)
+
 	Local $hBGColor = "0xFF" & Hex(__UC_ParentColor($hWnd), 6)
 
 	Local $hGraphics = _GDIPlus_GraphicsCreateFromHWND($hWnd)
-	Local $aSize = WinGetClientSize($hWnd)
-	Local $iW = $aSize[0], $iH = $aSize[1]
+;~ 	Local $aSize = WinGetClientSize($hWnd)
+;~ 	Local $iW = $aSize[0], $iH = $aSize[1]
+	Local $iW = $m.UC_Width, $iH = $m.UC_Height
 
 	; Buffer Setup
 	Local $hBitmap = _GDIPlus_BitmapCreateFromGraphics($iW, $iH, $hGraphics)
@@ -66,10 +76,9 @@ Func _UC_Toggle_Draw($hWnd, ByRef $m)
 	_GDIPlus_GraphicsClear($hBack, $hBGColor)
 
 	; Resources
-	Local $hColor = "0xFF" & Hex($m.Value ? $m.OnColor : $m.OffColor, 6)
-	Local $hBrushBg = _GDIPlus_BrushCreateSolid($hColor)
-	Local $hBrushBtn = _GDIPlus_BrushCreateSolid("0xFF" & Hex($m.BtnColor, 6))
-	Local $hPenHotTrack = _GDIPlus_PenCreate("0x80" & Hex($m.BtnColor, 6), 4) ; HotTrack semi-transparent
+	Local $hBrushBg = _GDIPlus_BrushCreateSolid("0xff" & Hex($iBgColor, 6))
+	Local $hBrushBtn = _GDIPlus_BrushCreateSolid("0xff" & Hex($iBtnColor, 6))
+	Local $hPenHotTrack = _GDIPlus_PenCreate("0x80" & Hex($iBtnColor, 6), 4) ; HotTrack semi-transparent
 
 	Local $iR, $iXPos, $iBtnW
 
@@ -114,15 +123,19 @@ EndFunc   ;==>_UC_Toggle_Draw
 
 Func _UC_Toggle_WM_LBUTTONDOWN($idDummy, $hWnd, $iX, $iY)
 	#forceref $hWnd, $iX, $iY
-	Local $m = _UC_Properties($idDummy)
+	Local $m = _UC_Properties($idDummy, Default, Default, "UC_Toggle.au3")
+
+	__DW("_UC_Toggle_WM_LBUTTONDOWN :: $idDummy=" & $idDummy & " :: $m.State=" & $m.State & @CRLF, 1, ">> UC_Toggle.au3")
+
 	If $m.State = 0 Then Return ; If is Disabled
 	$m.State = 3 ; is pressed
-	_UC_Properties($idDummy, $m)
+	_UC_Properties($idDummy, $m, Default, "UC_Toggle.au3")
 	_WinAPI_SetCapture($hWnd)
 EndFunc   ;==>_UC_Toggle_WM_LBUTTONDOWN
 
 Func _UC_Toggle_WM_LBUTTONDBLCLK($idDummy, $hWnd, $iX, $iY)
 	#forceref $hWnd, $iX, $iY
+	__DW("_UC_Toggle_WM_LBUTTONDBLCLK :: $idDummy=" & $idDummy & @CRLF, 1, ">> UC_Toggle.au3")
 
 	; For now, a double click on a button should behave exactly like a fast single click.
 	; So we just forward the parameters straight to the Down handler.
@@ -131,7 +144,8 @@ EndFunc   ;==>_UC_Toggle_WM_LBUTTONDBLCLK
 
 Func _UC_Toggle_WM_LBUTTONUP($idDummy, $hWnd, $iX, $iY)
 	#forceref $idDummy, $iX, $iY
-	Local $m = _UC_Properties($idDummy)
+	Local $m = _UC_Properties($idDummy, Default, Default, "UC_Toggle.au3")
+	__DW("_UC_Toggle_WM_LBUTTONUP :: $idDummy=" & $idDummy & " :: $m.State=" & $m.State & @CRLF, 1, ">> UC_Toggle.au3")
 
 	If $m.State = 3 Then ; If is pressed
 		_WinAPI_ReleaseCapture()
@@ -140,30 +154,47 @@ Func _UC_Toggle_WM_LBUTTONUP($idDummy, $hWnd, $iX, $iY)
 		If _UC_IsMouseOver($hWnd) Or ($iX = -1 And $iY = -1) Then
 			$m.State = 2 ; Hover
 			$m.Value = ($m.Value = 1 ? 0 : 1)
-			_UC_Properties($idDummy, $m)
+			_UC_Properties($idDummy, $m, Default, "UC_Toggle.au3")
 			GUICtrlSendToDummy($idDummy, $m.Value) ; Execution!
 		Else
 			$m.State = 1 ; Normal (Cancel execution)
-			_UC_Properties($idDummy, $m)
+			_UC_Properties($idDummy, $m, Default, "UC_Toggle.au3")
 		EndIf
 	EndIf
 EndFunc   ;==>_UC_Toggle_WM_LBUTTONUP
 
 Func _UC_Toggle_WM_MOUSEMOVE($idDummy, $hWnd, $iX, $iY)
 	#forceref $hWnd, $iX, $iY
-	Local $m = _UC_Properties($idDummy)
+	Static $sFlag = 0
+	Local $m = _UC_Properties($idDummy, Default, Default, "UC_Toggle.au3")
+	__DW("_UC_Toggle_WM_MOUSEMOVE :: $idDummy=" & $idDummy & " :: $m.State=" & $m.State & " :: $sFlag=" & $sFlag & @CRLF, 1, ">> UC_Toggle.au3")
+
+	If Not MapExists($m, "State") Then Return 1 = __DW("_UC_Toggle_WM_MOUSEMOVE :: Not Map Exists $m.State" & @CRLF, 1, "!! UC_Toggle.au3")
+
+	; 🚧
+	If $sFlag = $idDummy & "-" & $m.State Then    ; 🚧 as new flag e.g. '4-2'
+		__DW("_UC_Toggle_WM_MOUSEMOVE :: $sFlag=" & $sFlag & " => Return" & @CRLF, 1, "-> UC_Toggle.au3")
+		Return
+	EndIf
+
 	If $m.State = 0 Then Return ; If is Disabled
 	If $m.State = 1 Then ; If is normal
 		$m.State = 2 ; Hover
-		_UC_Properties($idDummy, $m)
+
+		__DW('_UC_Toggle_WM_MOUSEMOVE :: -> New $sFlag from:' & $sFlag & "  to:" & $idDummy & "-" & $m.State & @CRLF, 1, "--> UC_Toggle.au3")
+
+		$sFlag = $idDummy & "-" & $m.State    ; 🚧
+		_UC_Properties($idDummy, $m, Default, "UC_Toggle.au3")
 	EndIf
 EndFunc   ;==>_UC_Toggle_WM_MOUSEMOVE
 
 Func _UC_Toggle_WM_SETFOCUS($idDummy, $hWnd, $iX, $iY)
+	__DW("_UC_Toggle_WM_SETFOCUS :: $idDummy=" & $idDummy & @CRLF, 1, ">> UC_Toggle.au3")
 	_UC_Toggle_WM_MOUSEMOVE($idDummy, $hWnd, $iX, $iY)
 EndFunc   ;==>_UC_Toggle_WM_SETFOCUS
 
 Func _UC_Toggle_WM_KEYDOWN($idDummy, $hWnd, $iKeyCode, $aXY)
+	__DW("_UC_Toggle_WM_KEYDOWN :: $idDummy=" & $idDummy & @CRLF, 1, ">> UC_Toggle.au3")
 	Switch $iKeyCode
 		Case $VK_SPACE
 			_UC_Toggle_WM_LBUTTONDOWN($idDummy, $hWnd, $aXY[0], $aXY[1])
