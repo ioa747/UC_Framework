@@ -41,7 +41,7 @@ I am sharing it now because I want to establish a solid foundation and gather fe
 
 Ideas for new controls to be integrated into the library.
 
-![GUI with UC_Framework](UC_Framework/UC/Assets/260527-120731-420_AutoIt3_6dpJp.gif)
+![GUI with UC_Framework](UC_Framework/UC/Assets/260617-114752-622_AutoIt3_Np4YQ.gif)
 
 ---
 
