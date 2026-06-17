@@ -2,7 +2,7 @@
 ;----------------------------------------------------------------------------------------
 ; Title...........: Example1.au3
 ; Description.....: Example of using the UC_Framework.au3
-; AutoIt Version..: 3.3.18.0   Author: ioa747           Script Version: 0.0.11.0
+; AutoIt Version..: 3.3.18.0   Author: ioa747           Script Version: 0.0.13.0
 ; Note............: Testet in Windows 11 Pro 25H2       Date:22/05/2026
 ; Link............: https://github.com/ioa747/UC_Framework
 ;----------------------------------------------------------------------------------------
@@ -13,12 +13,10 @@
 _Main()
 
 Func _Main()
-    Local $hMainGui = GUICreate("Universal Controls GUI", 580, 480, -1, -1, BitOR($WS_CLIPCHILDREN, $GUI_SS_DEFAULT_GUI))
-	ConsoleWrite("$hMainGui=" & $hMainGui & @CRLF)
-    _UC_GUISetBkColor(0xF0F0F0, $hMainGui)
+    Local $hMainGui = GUICreate("Universal Controls GUI", 580, 580, -1, -1, BitOR($WS_CLIPCHILDREN, $GUI_SS_DEFAULT_GUI))
+	_UC_GUISetBkColor(0xF0F0F0, $hMainGui)
 
     Local $idLblTheme = GUICtrlCreateLabel("GUI Theme", 20, 10, 150, 17)
-	ConsoleWrite("$idLblTheme=" & $idLblTheme & @CRLF)
 
     ; === Toggles ===
     Local $idToggleTheme = _UC_Toggle_Create($hMainGui, 20, 30, 50, 25, 0, 0xF0F0F0, 0x758184, 0xD1D1D1)
@@ -48,6 +46,9 @@ Func _Main()
     Local $btnRound3 = _UC_Button_Create($hMainGui, ChrW(59213), 300, 170, 35, 35, 34, 0xFF6A00, 0xFFFFFF)
     _UC_Set(-1, "Font", "Segoe Fluent Icons")
     _UC_Set(-1, "FontSize", 12)
+
+	Local $btnNextStep = _UC_Button_Create($hMainGui, ">", 520, 480, 35, 35, 34, 0x0047AB, 0xFFFFFF)
+    Local $btnPreviousStep = _UC_Button_Create($hMainGui, "<", 520, 520, 35, 35, 34, 0x0047AB, 0xFFFFFF)
 
     ; === Progressbar ===
     Local $idProgress = _UC_ProgressBar_Create($hMainGui, 20, 240, 350, 24, 0, 100, 50)
@@ -87,6 +88,15 @@ Func _Main()
 	Local $idBox3 = _UC_InfoBox_Create($hMainGui, 400, 270, 140, 55, "PAYED", "45k", "£", "Segoe UI" , 16, 0xE74C3C, 0xE74C3C, 0x1F1F1F, 0xE74C3C, 0xFFFFFF,6,0,0,0)
 
 	Local $idBox4 = _UC_InfoBox_Create($hMainGui, 400, 330, 140, 55, "MONEY", "200k", "$", "Segoe UI", 34, 0x0F52BA, 0x0F52BA, 0x90D5FF, 0x0F52BA, 0x000000, 6,1,1,1)
+
+	; === DatePicker ===
+	Local $dtp1 = _UC_DatePicker_Create($hMainGui, 400, 390, 120, 28)
+
+	; === Stepper ===
+	Local $aSteps[5] = ["Cart", "Address", "Payment", "Revision", "Completed"]
+	Local $aGlyphs[5] = ["1", "2", "3", "4", "5"]
+	Local $idStepper = _UC_Stepper_Create($hMainGui, 10, 480, 500, 80, $aSteps)
+	_UC_Stepper_SetGlyphs($idStepper, $aGlyphs)
 
     ; =================================================================
 
@@ -195,10 +205,16 @@ Func _Main()
             Case $idImage1, $idImage2, $idImage3
                 ConsoleWrite("'" & _UC_Get(Default, "Filename") & "'  Scale:" & _UC_Get(Default, "Scale") & @CRLF)
 
+			Case $btnNextStep
+				_UC_Stepper_Next($idStepper)
+			Case $btnPreviousStep
+				_UC_Stepper_Previous($idStepper)
 			Case $idRating
 				ConsoleWrite("$idRating=" & GUICtrlRead($idRating) & @CRLF)
 			Case $idBox3, $idBox4 ;$idBox1, $idBox2
                 ConsoleWrite("$idBox=" & _UC_Get(Default, "Title") & ": " & _UC_Get(Default, "Value") & @CRLF)
+			Case $dtp1
+				ConsoleWrite("$dtp1=" & $dtp1 & @CRLF)
         EndSwitch
 
     WEnd

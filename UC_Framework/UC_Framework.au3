@@ -21,4 +21,8 @@
 #include "UC\UC_HourMinute.au3"
 #include "UC\UC_Rating.au3"
 #include "UC\UC_InfoBox.au3"
+#include "UC\UC_Chart_Bar.au3"
+#include "UC\UC_Calendar.au3"
+#include "UC\UC_DatePicker.au3"
+#include "UC\UC_Stepper.au3"
 #EndRegion ; ~~~~~~~~~~~~~ Components ~~~~~~~~~~~~~

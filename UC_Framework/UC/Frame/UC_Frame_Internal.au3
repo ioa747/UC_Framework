@@ -79,27 +79,34 @@ EndFunc   ;==>__UC_Framework_Init
 Func __UC_Main_MsgHandler($hWnd, $iMsg, $wParam, $lParam)
 	#forceref $wParam
 	Local Static $hLastChild = 0, $hToolTipGUI = _UC_Properties(1, "UC_ToolTip_hWnd", Default, "UC_Frame_Internal.au3")
+	Local Static $sFilterFlag = "" ; Central filter to avoid unnecessary redraws/calls
 
 	If $hToolTipGUI = $hWnd Then Return $GUI_RUNDEFMSG
 
-	; First we check if the previous control needs "Reset"
+	; First we check if the previous control needs "Reset" from Hover State
 	; This must be done regardless of whether $hWnd is a UC control or not.
 	If $hLastChild And $hLastChild <> $hWnd Then
 		Local $idLast = Int(_WinAPI_GetProp($hLastChild, "UC_ControlID"))
 		If $idLast Then
 			Local $mLast = _UC_Properties($idLast, Default, Default, "UC_Frame_Internal.au3")
 
-			; Only if it is not already Normal or Disabled
-			If $mLast.State <> 1 Then
+			; Reset if the State is Hover (2)
+			If $mLast.State = 2 Then
 				_UC_ToolTip("")
-				If Not ($mLast.State == 0) Then
-					__DW("__UC_Main_MsgHandler :: previous control :: ID:" & Int($idLast) & " > from State: " & $mLast.State & " To: 1" & @CRLF, 1, "->> UC_Frame_Internal.au3")
-					$mLast.State = 1
-					_UC_Properties($idLast, $mLast, Default, "UC_Frame_Internal.au3")
-				EndIf
+				__DW("__UC_Main_MsgHandler :: previous control :: ID:" & Int($idLast) & " > from State: 2 To: 1" & @CRLF, 1, "->> UC_Frame_Internal.au3")
+				$mLast.State = 1
+				_UC_Properties($idLast, $mLast, Default, "UC_Frame_Internal.au3")
+				; 🚧 Once a control is reset, we clean the filter
+				; to be ready to accept hover again
+				$sFilterFlag = ""
+				$hLastChild = 0
+			ElseIf $mLast.State <> 3 Then
+				; 🚧 If it is not in Dragging (3), reset $hLastChild to zero.
+				$hLastChild = 0
 			EndIf
+		Else
+			$hLastChild = 0
 		EndIf
-		$hLastChild = 0
 	EndIf
 
 	; Now we check the current window
@@ -113,7 +120,7 @@ Func __UC_Main_MsgHandler($hWnd, $iMsg, $wParam, $lParam)
 
 	Switch $iMsg
 		Case $WM_PAINT
-			__DW("__UC_Main_MsgHandler ->> Case $WM_PAINT <<-" & @CRLF, 1, "<<- UC_Frame_Internal.au3")
+			__DW("__UC_Main_MsgHandler -> Case $WM_PAINT <-" & @CRLF, 1, "<- UC_Frame_Internal.au3")
 			_UC_Redraw($hWnd)
 			Local $tPAINTSTRUCT = DllStructCreate($tagPAINTSTRUCT)
 			_WinAPI_BeginPaint($hWnd, $tPAINTSTRUCT)
@@ -127,17 +134,34 @@ Func __UC_Main_MsgHandler($hWnd, $iMsg, $wParam, $lParam)
 			Return 0
 
 		Case $WM_MOUSEMOVE
+			Local $iState = _UC_Properties($idDummy, "State", Default, "UC_Frame_Internal.au3")
+
+			; 🚧 ΕΞΑΙΡΕΣΗ: Αν το State είναι 3 (Pressed/Dragging), ΔΕΝ φιλτράρουμε το MOUSEMOVE
+			If $iState <> 3 Then
+				; Check: If the control is already in this State, Return
+				If $sFilterFlag = $idDummy & "-" & $iState Then
+					 __DW("__UC_Main_MsgHandler :: <<-  Return <<- :: $sFilterFlag=" & $sFilterFlag & @CRLF, 1, "<<- UC_Frame_Internal.au3")
+					Return 0
+				EndIf
+			EndIf
+
+			; If it is not filtered, we proceed to normal execution
 			__UC_CallControlFunc($iMsg, $idDummy, $hWnd, $iX, $iY)
+
 			$hLastChild = $hWnd
 			_UC_Properties(1, "UC_ActiveControlID", Int($idDummy), "UC_Frame_Internal.au3")
 			_UC_Properties(1, "UC_ActiveControlType", Int($iCtrlType), "UC_Frame_Internal.au3")
+
+			; We update the central flag with the NEW state (after CallControlFunc changed the State to Hover)
+			$iState = _UC_Properties($idDummy, "State", Default, "UC_Frame_Internal.au3")
+			$sFilterFlag = $idDummy & "-" & $iState
+			__DW("__UC_Main_MsgHandler :: $sFilterFlag=" & $sFilterFlag & @CRLF, 1, "->>- UC_Frame_Internal.au3")
+
 			Return 0
 
 		Case $WM_SETFOCUS
 			__UC_CallControlFunc($iMsg, $idDummy, $hWnd, $iX, $iY)
 			$hLastChild = $hWnd
-			_UC_Properties(1, "UC_ActiveControlID", Int($idDummy), "UC_Frame_Internal.au3")
-			_UC_Properties(1, "UC_ActiveControlType", Int($iCtrlType), "UC_Frame_Internal.au3")
 			Return 0
 
 		Case $WM_KEYDOWN
@@ -149,7 +173,7 @@ Func __UC_Main_MsgHandler($hWnd, $iMsg, $wParam, $lParam)
 	EndSwitch
 
 	Return $GUI_RUNDEFMSG
-EndFunc   ;==>__UC_Main_MsgHandler00
+EndFunc   ;==>__UC_Main_MsgHandler
 
 Func __UC_CallControlFunc($iMsg, $id, $hWnd, $iX, $iY)
 	Local $m = _UC_Properties($id, Default, Default, "UC_Frame_Internal.au3")
