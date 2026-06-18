@@ -1,11 +1,10 @@
-; UC_Slider.au3
-#include-once
+#include-once ; UC_Slider.au3
 
 #include "Frame\UC_Frame.au3"
 
 #Region ; ~~~~~~~~~~~~~ UC Slider API ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 Func _UC_Slider_Create($hParent, $iX, $iY, $iW, $iH, $iMin = 0, $iMax = 100, $iValue = 0, $iType = 0, _
-		$hCol = 0x4CD964, $hTrackCol = 0xD1D1D1, $hThumbCol = 0xFFFFFF, $iTrackSize = 4)
+		$hCol = 0x4CD964, $hTrackCol = 0xD1D1D1, $hThumbCol = Default, $iTrackSize = 4)
 
 	GUISwitch($hParent)
 	Local $idDummy = GUICtrlCreateDummy()
@@ -22,6 +21,8 @@ Func _UC_Slider_Create($hParent, $iX, $iY, $iW, $iH, $iMin = 0, $iMax = 100, $iV
 	$m.UC_ControlID = $idDummy
 	$m.UC_hWnd = $hChild
 	$m.UC_hParent = $hParent
+	$m.UC_Width = $iW
+	$m.UC_Height = $iH
 
 	; Registered Event Handlers
 	$m["UC_WM_" & $WM_LBUTTONDOWN] = "_WM_LBUTTONDOWN"
@@ -31,7 +32,7 @@ Func _UC_Slider_Create($hParent, $iX, $iY, $iW, $iH, $iMin = 0, $iMax = 100, $iV
 ;~ 	$m["UC_WM_" & $WM_RBUTTONUP] = "_WM_RBUTTONUP"
 	$m["UC_WM_" & $WM_MOUSEMOVE] = "_WM_MOUSEMOVE"
 	$m["UC_WM_" & $WM_SETFOCUS] = "_WM_SETFOCUS"
-	$m["UC_WM_" & $WM_KEYDOWN] = "_WM_KEYDOWN"
+;~ 	$m["UC_WM_" & $WM_KEYDOWN] = "_WM_KEYDOWN"
 
 	; Toggle Specific Properties
 	$m.State = 1                    ; 0=Disable ; 1=Normal ; 2=Hover ; 3=Pressed
@@ -57,10 +58,12 @@ Func _UC_Slider_Create($hParent, $iX, $iY, $iW, $iH, $iMin = 0, $iMax = 100, $iV
 EndFunc   ;==>_UC_Slider_Create
 
 Func _UC_Slider_Draw($hWnd, ByRef $m)
+
+	Local $mTheme = _UC_Themes("Active")
+	Local $hThumbCol = ($m.ThumbColor = Default ? $mTheme.Surface_Face : $m.ThumbColor)
+	Local $iW = $m.UC_Width, $iH = $m.UC_Height
 	Local $hBGColor = "0xFF" & Hex(__UC_ParentColor($hWnd), 6)
 	Local $hGraphics = _GDIPlus_GraphicsCreateFromHWND($hWnd)
-	Local $aSize = WinGetClientSize($hWnd)
-	Local $iW = $aSize[0], $iH = $aSize[1]
 
 	; Buffer Setup
 	Local $hBitmap = _GDIPlus_BitmapCreateFromGraphics($iW, $iH, $hGraphics)
@@ -81,9 +84,9 @@ Func _UC_Slider_Draw($hWnd, ByRef $m)
 	; Brushes & Pens
 	Local $hBrushTrack = _GDIPlus_BrushCreateSolid("0xFF" & Hex($m.TrackColor, 6))
 	Local $hBrushFill = _GDIPlus_BrushCreateSolid("0xFF" & Hex($m.Color, 6))
-	Local $hBrushThumb = _GDIPlus_BrushCreateSolid("0xFF" & Hex($m.ThumbColor, 6))
-	Local $hPenThumbBorder = _GDIPlus_PenCreate(0xFF888888, 1)
-	Local $hPenHotTrack = _GDIPlus_PenCreate("0x80" & Hex($m.ThumbColor, 6), 4)
+	Local $hBrushThumb = _GDIPlus_BrushCreateSolid("0xFF" & Hex($hThumbCol, 6))
+	Local $hPenThumbBorder = _GDIPlus_PenCreate("0xFF" & Hex($mTheme.Surface_Border, 6), 1)
+	Local $hPenHotTrack = _GDIPlus_PenCreate("0x80" & Hex($mTheme.Surface_Border, 6), 3)
 
 	Local $iThumbSizeW, $iThumbSizeH, $iR, $iTrackR
 
@@ -187,7 +190,7 @@ Func _UC_Slider_WM_LBUTTONDOWN($idDummy, $hWnd, $iX, $iY)
 	$m.IsDragging = 1
 	$m.State = 3 ; Pressed
 	If $m.ShowTooltip Then _UC_ToolTip(String($m.Value))
-	_UC_Properties($idDummy, $m, False) ; *** False to avoid _UC_Redraw
+	_UC_Properties($idDummy, $m)
 	_WinAPI_SetCapture($hWnd)
 	_UC_Slider_UpdateFromMouse($hWnd, $m, $iX, $iY)
 EndFunc   ;==>_UC_Slider_WM_LBUTTONDOWN
@@ -228,19 +231,6 @@ EndFunc   ;==>_UC_Slider_WM_MOUSEMOVE
 
 Func _UC_Slider_WM_SETFOCUS($idDummy, $hWnd, $iX, $iY)
     _UC_Slider_WM_MOUSEMOVE($idDummy, $hWnd, $iX, $iY)
-EndFunc
-
-Func _UC_Slider_WM_KEYDOWN($idDummy, $hWnd, $iKeyCode, $aXY)
-    Switch $iKeyCode
-        Case $VK_ADD
-            _UC_Slider_UpdateFromValue($idDummy, 1)
-        Case $VK_SUBTRACT
-            _UC_Slider_UpdateFromValue($idDummy, -1)
-        Case $VK_SPACE
-            _UC_Slider_WM_LBUTTONDOWN($idDummy, $hWnd, $aXY[0], $aXY[1])
-            Sleep(50)
-            _UC_Slider_WM_LBUTTONUP($idDummy, $hWnd, -1, -1)
-    EndSwitch
 EndFunc
 
 Func _UC_Slider_UpdateFromValue($idDummy = Default, $iValue = 1)
