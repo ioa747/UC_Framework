@@ -7,7 +7,8 @@
 ; Link............: https://github.com/ioa747/UC_Framework
 ;----------------------------------------------------------------------------------------
 ;~ #AutoIt3Wrapper_Au3Check_Parameters=-d -w 1 -w 2 -w 3 -w 4 -w 5 -w 6 -w 7
-#include-once
+
+#include-once ; UC_Frame.au3
 
 #Region ; ~~~ Native AutoIt UDF ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 #include <AutoItConstants.au3>
@@ -20,6 +21,7 @@
 #include <StaticConstants.au3>
 #include <String.au3>
 #include <WinAPIvkeysConstants.au3>
+#include <EditConstants.au3>
 #EndRegion ; ~~~ Native AutoIt UDF ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 #Region ; ~~~ Global  variable\constant ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 Global $g_UC_DebugInfo = 0
@@ -41,6 +43,7 @@ Global Enum _
         $UC_TYPE_DATEPICKER, _
         $UC_TYPE_CALENDAR, _
 		$UC_TYPE_STEPPER, _
+		$UC_TYPE_NEO, _
         $UC_TYPE_MAX
 
 Global Const $aUC_Types[] = [ _
@@ -59,7 +62,8 @@ Global Const $aUC_Types[] = [ _
         "Chart_Bar", _      ; $UC_TYPE_CHART_BAR
         "DatePicker", _     ; $UC_TYPE_DATEPICKER
         "Calendar", _       ; $UC_TYPE_CALENDAR
-		"Stepper" _         ; $UC_TYPE_STEPPER
+		"Stepper", _        ; $UC_TYPE_STEPPER
+		"Neo" _             ; $UC_TYPE_NEO
         ]
 
 #EndRegion ; ~~~ Global  variable\constant ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~

@@ -1,5 +1,4 @@
-; UC_Frame_Internal.au3
-#include-once
+#include-once ; UC_Frame_Internal.au3
 
 #include "UC_Frame.au3"
 
@@ -136,11 +135,11 @@ Func __UC_Main_MsgHandler($hWnd, $iMsg, $wParam, $lParam)
 		Case $WM_MOUSEMOVE
 			Local $iState = _UC_Properties($idDummy, "State", Default, "UC_Frame_Internal.au3")
 
-			; 🚧 ΕΞΑΙΡΕΣΗ: Αν το State είναι 3 (Pressed/Dragging), ΔΕΝ φιλτράρουμε το MOUSEMOVE
+			; 🚧 EXCEPTION: If State is 3 (Pressed/Dragging), we DO NOT filter MOUSEMOVE
 			If $iState <> 3 Then
 				; Check: If the control is already in this State, Return
 				If $sFilterFlag = $idDummy & "-" & $iState Then
-					 __DW("__UC_Main_MsgHandler :: <<-  Return <<- :: $sFilterFlag=" & $sFilterFlag & @CRLF, 1, "<<- UC_Frame_Internal.au3")
+					__DW("__UC_Main_MsgHandler :: <<-  Return <<- :: $sFilterFlag=" & $sFilterFlag & @CRLF, 1, "<<- UC_Frame_Internal.au3")
 					Return 0
 				EndIf
 			EndIf
@@ -190,7 +189,8 @@ Func __UC_CallControlFunc($iMsg, $id, $hWnd, $iX, $iY)
 
 		; Error Handling
 		If @error = 0xDEAD And @extended = 0xBEEF Then
-			If $g_UC_DebugInfo Then __DW("!Error: Registered event " & $sEventName & " but function " & $sFuncName & " missing.")
+			; 🚧 ConsoleWrite or __DW ??
+			ConsoleWrite("!Error __UC_CallControlFunc: Registered event " & $sEventName & " but function (or parameter) " & $sFuncName & " is missing. " & @CRLF)
 			Return SetError(1, 0, False)
 		EndIf
 		Return $vRet
@@ -232,39 +232,39 @@ EndFunc   ;==>__DW
 
 #Region ; ~~~~~~~~~~~~~ UC_Themes Functions for Theme Management ~~~~~~~~~~~~~~~~~
 Func _UC_CreateDefaultIni($sIniPath)
-    Local $sTxt = ""
-    $sTxt &= "[ThemeConfig]" & @CRLF
-    $sTxt &= "Default=auto" & @CRLF
-    $sTxt &= "DefaultLight= Light" & @CRLF
-    $sTxt &= "DefaultDark=Dark" & @CRLF
-    $sTxt &= "[Light]" & @CRLF
-    $sTxt &= "Themes_Name=Light" & @CRLF
-    $sTxt &= "Themes_IsLightColor=1" & @CRLF
-    $sTxt &= "Themes_Workspace=0x758184" & @CRLF
-    $sTxt &= "Themes_Accent=0x388692" & @CRLF
-    $sTxt &= "Surface_Face=0xF0F0F0" & @CRLF
-    $sTxt &= "Surface_Hot=0x0066CC" & @CRLF
-    $sTxt &= "Surface_Border=0xABABAB" & @CRLF
-    $sTxt &= "Surface_Disabled=0xD8D8D8" & @CRLF
-    $sTxt &= "Text_fore=0x000000" & @CRLF
-    $sTxt &= "Text_Back=0xFFFFFF" & @CRLF
-    $sTxt &= "Fonts_Name=Segoe UI" & @CRLF
-    $sTxt &= "Fonts_Size=9" & @CRLF
-    $sTxt &= "Fonts_Weight=400" & @CRLF
-    $sTxt &= "[Dark]" & @CRLF
-    $sTxt &= "Themes_Name=Dark" & @CRLF
-    $sTxt &= "Themes_IsLightColor=0" & @CRLF
-    $sTxt &= "Themes_Workspace=0x758184" & @CRLF
-    $sTxt &= "Themes_Accent=0x388692" & @CRLF
-    $sTxt &= "Surface_Face=0x2D2D2D" & @CRLF
-    $sTxt &= "Surface_Hot=0x3399FF" & @CRLF
-    $sTxt &= "Surface_Border=0x454545" & @CRLF
-    $sTxt &= "Surface_Disabled=0x8D8D8D" & @CRLF
-    $sTxt &= "Text_fore=0xFFFFFF" & @CRLF
-    $sTxt &= "Text_Back=0x1E1E1E" & @CRLF
-    $sTxt &= "Fonts_Name=Segoe UI" & @CRLF
-    $sTxt &= "Fonts_Size=9" & @CRLF
-    $sTxt &= "Fonts_Weight=400"
+	Local $sTxt = ""
+	$sTxt &= "[ThemeConfig]" & @CRLF
+	$sTxt &= "Default=auto" & @CRLF
+	$sTxt &= "DefaultLight= Light" & @CRLF
+	$sTxt &= "DefaultDark=Dark" & @CRLF
+	$sTxt &= "[Light]" & @CRLF
+	$sTxt &= "Themes_Name=Light" & @CRLF
+	$sTxt &= "Themes_IsLightColor=1" & @CRLF
+	$sTxt &= "Themes_Workspace=0x758184" & @CRLF
+	$sTxt &= "Themes_Accent=0x388692" & @CRLF
+	$sTxt &= "Surface_Face=0xF0F0F0" & @CRLF
+	$sTxt &= "Surface_Hot=0x0066CC" & @CRLF
+	$sTxt &= "Surface_Border=0xABABAB" & @CRLF
+	$sTxt &= "Surface_Disabled=0xCCCCCC" & @CRLF
+	$sTxt &= "Text_Disabled=0x888888" & @CRLF
+	$sTxt &= "Text_fore=0x000000" & @CRLF
+	$sTxt &= "Text_Back=0xFFFFFF" & @CRLF
+	$sTxt &= "Fonts_Name=Segoe UI" & @CRLF
+	$sTxt &= "Fonts_Size=9" & @CRLF
+	$sTxt &= "[Dark]" & @CRLF
+	$sTxt &= "Themes_Name=Dark" & @CRLF
+	$sTxt &= "Themes_IsLightColor=0" & @CRLF
+	$sTxt &= "Themes_Workspace=0x758184" & @CRLF
+	$sTxt &= "Themes_Accent=0x388692" & @CRLF
+	$sTxt &= "Surface_Face=0x2D2D2D" & @CRLF
+	$sTxt &= "Surface_Hot=0x3399FF" & @CRLF
+	$sTxt &= "Surface_Border=0xABABAB" & @CRLF
+	$sTxt &= "Surface_Disabled=0xCCCCCC" & @CRLF
+	$sTxt &= "Text_Disabled=0x888888" & @CRLF
+	$sTxt &= "Text_fore=0xFFFFFF" & @CRLF
+	$sTxt &= "Text_Back=0x1E1E1E" & @CRLF
+	$sTxt &= "Fonts_Name=Segoe UI" & @CRLF
+	$sTxt &= "Fonts_Size=9"
 
 	FileWrite($sIniPath, $sTxt)
 EndFunc   ;==>_UC_CreateDefaultIni
@@ -289,7 +289,6 @@ Func _UC_Themes($sTheme = Default, $vName = Default, $vVal = Default)
 
 		Case IsMap($vName)
 			$mTheme[$sTheme] = $vName ; SET MAP
-;~ 			If $vVal = Default And MapExists($vName, "UC_hWnd") Then _UC_Redraw($vName.UC_hWnd)
 			Return 1
 
 		Case Else
@@ -302,13 +301,11 @@ Func _UC_Themes($sTheme = Default, $vName = Default, $vVal = Default)
 			Else ; SET Val
 				If $vName = "@Delete" Then
 					$mTheme[$sTheme] = ""
-;~ 					If $vVal = Default Then _UC_Redraw($m.UC_hWnd)
 					Return 1
 				EndIf
 
 				$m[$vName] = $vVal
 				$mTheme[$sTheme] = $m
-;~ 				_UC_Redraw($m.UC_hWnd)
 				Return 1
 			EndIf
 	EndSelect
@@ -316,7 +313,7 @@ EndFunc   ;==>_UC_Themes
 
 Func _UC_Theme_Switch($sNewThemeName)
 	_UC_Themes("Active", _UC_Themes($sNewThemeName))
-;~ 	_UC_Resource_Cleanup() ; Αδειάζει τα παλιά Brushes/Pens από το pool
-;~     _UC_Redraw_All() ; Ενημέρωση όλου του GUI
+;~ 	_UC_Resource_Cleanup()
+;~  _UC_Redraw_All()
 EndFunc   ;==>_UC_Theme_Switch
 #EndRegion ; ~~~~~~~~~~~~~ UC_Themes Functions for Theme Management ~~~~~~~~~~~~~~~~~

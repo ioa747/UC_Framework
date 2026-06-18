@@ -1,5 +1,4 @@
-; UC_Frame_Map.au3
-#include-once
+#include-once ; UC_Frame_Map.au3
 
 #include "UC_Frame.au3"
 

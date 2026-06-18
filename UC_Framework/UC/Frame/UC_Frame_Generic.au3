@@ -1,52 +1,6 @@
-; UC_Frame_Generic.au3
-#include-once
+#include-once ; UC_Frame_Generic.au3
 
 #include "UC_Frame.au3"
-
-
-#CS
-#include <GUIConstantsEx.au3>
-#include <WindowsConstants.au3>
-#include <WinAPISysWin.au3>
-#include <WinAPISys.au3>
-#include <WinAPIGdi.au3>
-#include <StaticConstants.au3>
-#include <String.au3>
-#include <WinAPIvkeysConstants.au3>
-
-Global $g_UC_DebugInfo = 0
-
-Global Enum _
-		$UC_TYPE_NONE, _
-		$UC_TYPE_TOGGLE, _
-		$UC_TYPE_SLIDER, _
-		$UC_TYPE_BUTTON, _
-		$UC_TYPE_LINK, _
-		$UC_TYPE_LABEL, _
-		$UC_TYPE_IMAGE, _
-		$UC_TYPE_PROGRESSBAR, _
-		$UC_TYPE_RADIALPROGRESS, _
-		$UC_TYPE_HOURMINUTE, _
-		$UC_TYPE_RATING, _
-		$UC_TYPE_INFOBOX, _
-		$UC_TYPE_MAX
-
-Global Const $aUC_Types[] = [ _
-    "None", _             ; $UC_TYPE_NONE
-    "Toggle", _           ; $UC_TYPE_TOGGLE
-    "Slider", _           ; $UC_TYPE_SLIDER
-    "Button", _           ; $UC_TYPE_BUTTON
-    "Link", _             ; $UC_TYPE_LINK
-    "Label", _            ; $UC_TYPE_LABEL
-    "Image", _            ; $UC_TYPE_IMAGE
-    "ProgressBar", _      ; $UC_TYPE_PROGRESSBAR
-    "RadialProgress", _   ; $UC_TYPE_RADIALPROGRESS
-    "HourMinute", _       ; $UC_TYPE_HOURMINUTE
-	"Rating", _           ; $UC_TYPE_RATING
-	"InfoBox" _           ; $UC_TYPE_INFOBOX
-]
-
-#CE
 
 #Region ; ~~~~~~~~~~~~~ UC_Framework Generic API ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 Func _UC_Redraw($hWnd)
@@ -62,7 +16,7 @@ Func _UC_Redraw($hWnd)
 	__DW("_UC_Redraw :: UC_ControlID=" & $m.UC_ControlID & ", $sDrawFunc=" & $sDrawFunc & @CRLF, 1, "### UC_Frame_Generic.au3")
 
     Call($sDrawFunc, $hWnd, $m)
-    If @error = 0xDEAD And @extended = 0xBEEF Then __DW("!Error: Function " & $sDrawFunc & " was not found for Control ID: " & $id)
+    If @error = 0xDEAD And @extended = 0xBEEF Then ConsoleWrite("!Error in _UC_Redraw: Function " & $sDrawFunc & " was not found for Control ID: " & $id & @CRLF)
 ;~ 	_UC_Properties($id, $m, False) ; update the $m
 EndFunc
 

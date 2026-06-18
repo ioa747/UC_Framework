@@ -1,5 +1,4 @@
-; UC_Frame_GDI.au3
-#include-once
+#include-once ; UC_Frame_GDI.au3
 
 ;~ #include <GDIPlus.au3>
 
