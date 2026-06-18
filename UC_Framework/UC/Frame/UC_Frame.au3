@@ -43,7 +43,6 @@ Global Enum _
         $UC_TYPE_DATEPICKER, _
         $UC_TYPE_CALENDAR, _
 		$UC_TYPE_STEPPER, _
-		$UC_TYPE_NEO, _
         $UC_TYPE_MAX
 
 Global Const $aUC_Types[] = [ _
@@ -62,8 +61,7 @@ Global Const $aUC_Types[] = [ _
         "Chart_Bar", _      ; $UC_TYPE_CHART_BAR
         "DatePicker", _     ; $UC_TYPE_DATEPICKER
         "Calendar", _       ; $UC_TYPE_CALENDAR
-		"Stepper", _        ; $UC_TYPE_STEPPER
-		"Neo" _             ; $UC_TYPE_NEO
+		"Stepper" _         ; $UC_TYPE_STEPPER
         ]
 
 #EndRegion ; ~~~ Global  variable\constant ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
