@@ -161,6 +161,8 @@ Func __UC_Main_MsgHandler($hWnd, $iMsg, $wParam, $lParam)
 		Case $WM_SETFOCUS
 			__UC_CallControlFunc($iMsg, $idDummy, $hWnd, $iX, $iY)
 			$hLastChild = $hWnd
+			_UC_Properties(1, "UC_ActiveControlID", Int($idDummy), "UC_Frame_Internal.au3")
+			_UC_Properties(1, "UC_ActiveControlType", Int($iCtrlType), "UC_Frame_Internal.au3")
 			Return 0
 
 		Case $WM_KEYDOWN
