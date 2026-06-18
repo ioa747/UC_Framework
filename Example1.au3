@@ -2,7 +2,7 @@
 ;----------------------------------------------------------------------------------------
 ; Title...........: Example1.au3
 ; Description.....: Example of using the UC_Framework.au3
-; AutoIt Version..: 3.3.18.0   Author: ioa747           Script Version: 0.0.13.1
+; AutoIt Version..: 3.3.18.0   Author: ioa747           Script Version: 0.0.13.2
 ; Note............: Testet in Windows 11 Pro 25H2       Date:22/05/2026
 ; Link............: https://github.com/ioa747/UC_Framework
 ;----------------------------------------------------------------------------------------
@@ -26,9 +26,13 @@ Func _Main()
     ; === Sliders ===
     Local $idHLabel = GUICtrlCreateLabel("Horizontal Slider (50):", 20, 180)
     Local $idHSlider = _UC_Slider_Create($hMainGui, 20, 200, 180, 20, 0, 100, 50, 0, 0x4CD964, 0xCCCCCC, 0xFFFFFF, 4)
+	_UC_Set(-1, "ShowTooltip", 1)   ; standar property
+	_UC_Set(-1, "SliderXLStep", 5)  ; customizable property
 
     Local $idVLabel = _UC_Label_Create($hMainGui, "Vertical Slider (20):", 340, 25, 20, 150, 3)
     Local $idVSlider = _UC_Slider_Create($hMainGui, 360, 25, 20, 150, 0, 20, 20, 1, 0x0078D7)
+	_UC_Set(-1, "ShowTooltip", 1)   ; standar property
+	_UC_Set(-1, "SliderXLStep", 5)  ; customizable property
 
     ; === Buttons ===
     Local $btnClassic = _UC_Button_Create($hMainGui, "CLASSIC RECT", 220, 20, 100, 35, 0, 0x3A71B1, 0xFFFFFF)
@@ -113,7 +117,7 @@ Func _Main()
     GUISetAccelerators($aAccelKeys)
     GUISetState(@SW_SHOW)
 
-    _MapCW(_UC_Get(1), "~~~ System Variable ~~~")
+;~     _MapCW(_UC_Get(1), "~~~ System Variable ~~~")
 
     Local $iMsg, $iSliderXLStep, $iVal, $iTimeValue
     While 1
