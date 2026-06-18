@@ -2,7 +2,7 @@
 ;----------------------------------------------------------------------------------------
 ; Title...........: Example1.au3
 ; Description.....: Example of using the UC_Framework.au3
-; AutoIt Version..: 3.3.18.0   Author: ioa747           Script Version: 0.0.13.0
+; AutoIt Version..: 3.3.18.0   Author: ioa747           Script Version: 0.0.13.1
 ; Note............: Testet in Windows 11 Pro 25H2       Date:22/05/2026
 ; Link............: https://github.com/ioa747/UC_Framework
 ;----------------------------------------------------------------------------------------
@@ -27,7 +27,7 @@ Func _Main()
     Local $idHLabel = GUICtrlCreateLabel("Horizontal Slider (50):", 20, 180)
     Local $idHSlider = _UC_Slider_Create($hMainGui, 20, 200, 180, 20, 0, 100, 50, 0, 0x4CD964, 0xCCCCCC, 0xFFFFFF, 4)
 
-    Local $idVLabel = _UC_Label_Create($hMainGui, "Vertical Slider (20):", 340, 25, 20, 150, 3, 0x000000)
+    Local $idVLabel = _UC_Label_Create($hMainGui, "Vertical Slider (20):", 340, 25, 20, 150, 3)
     Local $idVSlider = _UC_Slider_Create($hMainGui, 360, 25, 20, 150, 0, 20, 20, 1, 0x0078D7)
 
     ; === Buttons ===
@@ -90,7 +90,7 @@ Func _Main()
 	Local $idBox4 = _UC_InfoBox_Create($hMainGui, 400, 330, 140, 55, "MONEY", "200k", "$", "Segoe UI", 34, 0x0F52BA, 0x0F52BA, 0x90D5FF, 0x0F52BA, 0x000000, 6,1,1,1)
 
 	; === DatePicker ===
-	Local $dtp1 = _UC_DatePicker_Create($hMainGui, 400, 390, 120, 28)
+	Local $dtp1 = _UC_DatePicker_Create($hMainGui, 400, 200, 120, 28)
 
 	; === Stepper ===
 	Local $aSteps[5] = ["Cart", "Address", "Payment", "Revision", "Completed"]
@@ -113,9 +113,7 @@ Func _Main()
     GUISetAccelerators($aAccelKeys)
     GUISetState(@SW_SHOW)
 
-    _MapCW(_UC_Get(1), "--- System Variable ---")
-	ConsoleWrite("---------------------" & @CRLF)
-
+    _MapCW(_UC_Get(1), "~~~ System Variable ~~~")
 
     Local $iMsg, $iSliderXLStep, $iVal, $iTimeValue
     While 1
@@ -154,10 +152,10 @@ Func _Main()
 
                 GUICtrlSetColor($idLblTheme, $iTxtColor)
                 GUICtrlSetColor($idHLabel, $iTxtColor)
-                _UC_Set($idVLabel, "Color", $iTxtColor)
+;~              _UC_Set($idVLabel, "Color", $iTxtColor)
 
-				_UC_Set($idHourMinute, "BoxColor", $iBkColor)
-				_UC_Set($idHourMinute, "TextColor", $iTxtColor)
+;~ 				_UC_Set($idHourMinute, "BoxColor", $iBkColor)
+;~ 				_UC_Set($idHourMinute, "TextColor", $iTxtColor)
 
                 _UC_Refresh($hMainGui)
 
@@ -199,8 +197,7 @@ Func _Main()
 
             Case $btnRound3
                 ConsoleWrite("'" & GUICtrlRead($btnRound3) & "' Button Clicked!" & @CRLF)
-				_MapCW(_UC_Get($btnRound3), "--- $btnRound3 ---")
-				ConsoleWrite("---------------------" & @CRLF)
+				_MapCW(_UC_Get($btnRound3), "~~~ $btnRound3 ~~~")
 
             Case $idImage1, $idImage2, $idImage3
                 ConsoleWrite("'" & _UC_Get(Default, "Filename") & "'  Scale:" & _UC_Get(Default, "Scale") & @CRLF)
