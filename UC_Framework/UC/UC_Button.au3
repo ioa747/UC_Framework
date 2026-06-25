@@ -29,6 +29,9 @@ Func _UC_Button_Create($hParent, $sText, $iX, $iY, $iW, $iH, $iCorner = 0, $hBtn
 	$m.UC_ControlID = $idDummy
 	$m.UC_hWnd = $hChild
 	$m.UC_hParent = $hParent
+	$m.UC_Width = $iW
+	$m.UC_Height = $iH
+	$m.UC_Shadow = 1  ; 💡 1 = Shadow active, 0 = Inactive
 
 	; Registered Event Handlers
 	$m["UC_WM_" & $WM_LBUTTONDOWN] = "_WM_LBUTTONDOWN"
@@ -126,6 +129,9 @@ Func _UC_Button_Draw($hWnd, ByRef $m)
 
 	; Present to Screen (Double Buffering)
 	_GDIPlus_GraphicsDrawImage($hGraphics, $hBitmap, 0, 0)
+
+	; 💡AUTOMATED SHADOW ENGINE
+	If $m.UC_Shadow = 1 Then _UC_Shadow_Overlay($m.UC_ControlID, 150, 10, True, -1)
 
 	; Cleanup Section
 	_GDIPlus_BrushDispose($hBrushBg)

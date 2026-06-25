@@ -2,7 +2,7 @@
 ;----------------------------------------------------------------------------------------
 ; Title...........: UC_Frame.au3
 ; Description.....: Native AutoIt UDF, UC_Frame_[UDF], Global variable\constant for the UC_Framework
-; AutoIt Version..: 3.3.18.0   Author: ioa747           Script Version: 0.0.13.1
+; AutoIt Version..: 3.3.18.0   Author: ioa747           Script Version: 0.0.13.3
 ; Note............: Testet in Windows 11 Pro 25H2       Date:22/05/2026
 ; Link............: https://github.com/ioa747/UC_Framework
 ;----------------------------------------------------------------------------------------
@@ -22,6 +22,7 @@
 #include <String.au3>
 #include <WinAPIvkeysConstants.au3>
 #include <EditConstants.au3>
+#include <WinAPIConstants.au3>
 #EndRegion ; ~~~ Native AutoIt UDF ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 #Region ; ~~~ Global  variable\constant ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 Global $g_UC_DebugInfo = 0
@@ -43,6 +44,7 @@ Global Enum _
         $UC_TYPE_DATEPICKER, _
         $UC_TYPE_CALENDAR, _
 		$UC_TYPE_STEPPER, _
+		$UC_TYPE_NEO, _
         $UC_TYPE_MAX
 
 Global Const $aUC_Types[] = [ _
@@ -61,7 +63,8 @@ Global Const $aUC_Types[] = [ _
         "Chart_Bar", _      ; $UC_TYPE_CHART_BAR
         "DatePicker", _     ; $UC_TYPE_DATEPICKER
         "Calendar", _       ; $UC_TYPE_CALENDAR
-		"Stepper" _         ; $UC_TYPE_STEPPER
+		"Stepper", _        ; $UC_TYPE_STEPPER
+		"Neo" _             ; $UC_TYPE_NEO
         ]
 
 #EndRegion ; ~~~ Global  variable\constant ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -72,5 +75,6 @@ Global Const $aUC_Types[] = [ _
 #include "UC_Frame_GDI.au3"
 #include "UC_Frame_WinAPI.au3"
 #include "UC_Frame_Timers.au3"
+#include "UC_Frame_Shadow.au3"
 #EndRegion ; ~~~ UC_Frame_...  UDF ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 

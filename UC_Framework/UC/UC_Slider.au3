@@ -23,6 +23,7 @@ Func _UC_Slider_Create($hParent, $iX, $iY, $iW, $iH, $iMin = 0, $iMax = 100, $iV
 	$m.UC_hParent = $hParent
 	$m.UC_Width = $iW
 	$m.UC_Height = $iH
+	$m.UC_Shadow = 1  ; 💡 1 = Shadow active, 0 = Inactive
 
 	; Registered Event Handlers
 	$m["UC_WM_" & $WM_LBUTTONDOWN] = "_WM_LBUTTONDOWN"
@@ -134,6 +135,9 @@ Func _UC_Slider_Draw($hWnd, ByRef $m)
 
 	; Present to Screen
 	_GDIPlus_GraphicsDrawImageRect($hGraphics, $hBitmap, 0, 0, $iW, $iH)
+
+	; 💡AUTOMATED SHADOW ENGINE
+	If $m.UC_Shadow = 1 Then _UC_Shadow_Overlay($m.UC_ControlID, 150, 10, True, -1)
 
 	; Cleanup
 	_GDIPlus_PenDispose($hPenHotTrack)
