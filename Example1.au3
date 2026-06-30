@@ -2,7 +2,7 @@
 ;----------------------------------------------------------------------------------------
 ; Title...........: Example1.au3
 ; Description.....: Example of using the UC_Framework.au3
-; AutoIt Version..: 3.3.18.0   Author: ioa747           Script Version: 0.0.13.3
+; AutoIt Version..: 3.3.18.0   Author: ioa747           Script Version: 0.0.12.0
 ; Note............: Testet in Windows 11 Pro 25H2       Date:22/05/2026
 ; Link............: https://github.com/ioa747/UC_Framework
 ;----------------------------------------------------------------------------------------
