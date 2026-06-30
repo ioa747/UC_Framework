@@ -1,24 +1,70 @@
-#include-once ; UC_Frame_Generic.au3
+; UC_Frame_Generic.au3
+#include-once
 
 #include "UC_Frame.au3"
 
+
+#CS
+#include <GUIConstantsEx.au3>
+#include <WindowsConstants.au3>
+#include <WinAPISysWin.au3>
+#include <WinAPISys.au3>
+#include <WinAPIGdi.au3>
+#include <StaticConstants.au3>
+#include <String.au3>
+#include <WinAPIvkeysConstants.au3>
+
+Global $g_UC_DebugInfo = 0
+
+Global Enum _
+		$UC_TYPE_NONE, _
+		$UC_TYPE_TOGGLE, _
+		$UC_TYPE_SLIDER, _
+		$UC_TYPE_BUTTON, _
+		$UC_TYPE_LINK, _
+		$UC_TYPE_LABEL, _
+		$UC_TYPE_IMAGE, _
+		$UC_TYPE_PROGRESSBAR, _
+		$UC_TYPE_RADIALPROGRESS, _
+		$UC_TYPE_HOURMINUTE, _
+		$UC_TYPE_RATING, _
+		$UC_TYPE_INFOBOX, _
+		$UC_TYPE_MAX
+
+Global Const $aUC_Types[] = [ _
+    "None", _             ; $UC_TYPE_NONE
+    "Toggle", _           ; $UC_TYPE_TOGGLE
+    "Slider", _           ; $UC_TYPE_SLIDER
+    "Button", _           ; $UC_TYPE_BUTTON
+    "Link", _             ; $UC_TYPE_LINK
+    "Label", _            ; $UC_TYPE_LABEL
+    "Image", _            ; $UC_TYPE_IMAGE
+    "ProgressBar", _      ; $UC_TYPE_PROGRESSBAR
+    "RadialProgress", _   ; $UC_TYPE_RADIALPROGRESS
+    "HourMinute", _       ; $UC_TYPE_HOURMINUTE
+	"Rating", _           ; $UC_TYPE_RATING
+	"InfoBox" _           ; $UC_TYPE_INFOBOX
+]
+
+#CE
+
 #Region ; ~~~~~~~~~~~~~ UC_Framework Generic API ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 Func _UC_Redraw($hWnd)
-	Local $id = Int(_WinAPI_GetProp($hWnd, "UC_ControlID"))
-	If Not $id Then Return SetError(1, 0, 0)
-	Local $m = _UC_Properties($id, Default, Default, "UC_Frame_Generic.au3")
+    Local $id = Int(_WinAPI_GetProp($hWnd, "UC_ControlID"))
+    If Not $id Then Return SetError(1, 0, 0)
+    Local $m = _UC_Properties($id, Default, Default, "UC_Frame_Generic.au3")
 
-	If $m.UC_Type = $UC_TYPE_NONE Then Return
+    If $m.UC_Type = $UC_TYPE_NONE Then Return
 
-	; Creating the function name
-	Local $sDrawFunc = "_UC_" & $aUC_Types[$m.UC_Type] & "_Draw"
+    ; Creating the function name
+    Local $sDrawFunc = "_UC_" & $aUC_Types[$m.UC_Type] & "_Draw"
 
 	__DW("_UC_Redraw :: UC_ControlID=" & $m.UC_ControlID & ", $sDrawFunc=" & $sDrawFunc & @CRLF, 1, "### UC_Frame_Generic.au3")
 
-	Call($sDrawFunc, $hWnd, $m)
-	If @error = 0xDEAD And @extended = 0xBEEF Then ConsoleWrite("!Error in _UC_Redraw: Function " & $sDrawFunc & " was not found for Control ID: " & $id & @CRLF)
+    Call($sDrawFunc, $hWnd, $m)
+    If @error = 0xDEAD And @extended = 0xBEEF Then __DW("!Error: Function " & $sDrawFunc & " was not found for Control ID: " & $id)
 ;~ 	_UC_Properties($id, $m, False) ; update the $m
-EndFunc   ;==>_UC_Redraw
+EndFunc
 
 ; #FUNCTION# ====================================================================================================================
 ; Name ..........: _UC_Properties
@@ -85,7 +131,7 @@ Func _UC_Properties($idDummy = Default, $vName = Default, $vVal = Default, $iFro
 
 ;~ 	__DW("_UC_Properties(" & $vID & ", " &  (IsMap($vName) ? "{" & VarGetType($vName) & "[" & UBound($vName) & "]}" : $vName)  & ", " &  $vVal  & ", " &  $iFrom  & ")" & @CRLF)
 
-	__DW("_UC_Properties(" & $idDummy & ", " & (IsMap($vName) ? "{" & VarGetType($vName) & "[" & UBound($vName) & "]}" : $vName) & ", " & $vVal & ") <-(" & $iFromfile & ":" & $iFromLine & ")-<" & @CRLF, 1, "+++ UC_Frame_Generic.au3")
+	__DW("_UC_Properties(" & $idDummy & ", " &  (IsMap($vName) ? "{" & VarGetType($vName) & "[" & UBound($vName) & "]}" : $vName)  & ", " &  $vVal  & ") <-(" & $iFromfile &":"& $iFromLine & ")-<" & @CRLF, 1, "+++ UC_Frame_Generic.au3")
 
 	; Map Selection (or Template)
 	Local $m = (IsMap($aProp[$idDummy]) ? $aProp[$idDummy] : $mMap)
@@ -205,9 +251,9 @@ EndFunc   ;==>_UC_Refresh
 Func _UC_GUISetBkColor000($iBkColor, $hWnd) ; 🚧
 	GUISetBkColor($iBkColor, $hWnd)
 	_WinAPI_SetProp($hWnd, "UC_GUIBkColor", $iBkColor)
-EndFunc   ;==>_UC_GUISetBkColor000
+EndFunc   ;==>_UC_GUISetBkColor
 
-Func _UC_GUISetBkColor($iBkColor, $hWnd, $iRefresh = 0)
+Func _UC_GUISetBkColor($iBkColor, $hWnd)
 	Local $iMsg = GUISetBkColor($iBkColor, $hWnd)
 	If $iMsg Then
 		_UC_Properties(1, "UC_GUIBkColor_" & $hWnd, $iBkColor, "UC_Frame_Generic.au3")
@@ -226,7 +272,7 @@ Func _UC_GUISetBkColor($iBkColor, $hWnd, $iRefresh = 0)
 		EndIf
 
 		; Trigger for Redraw on all controls in $hWnd
-		If $iRefresh = 1 Then _UC_Refresh($hWnd)
+		_UC_Refresh($hWnd)
 	EndIf
 	Return $iMsg
 EndFunc   ;==>_UC_GUISetBkColor
@@ -390,46 +436,25 @@ EndFunc   ;==>_UC_GetTextSize
 
 ; Returns the maximum font size that fits within the given width and height ; 🚧
 Func _UC_GetFitFontSize($sText, $sFont, $fStartSize, $iMaxWidth, $iMaxHeight, $iFontStyle = 0)
-	Local $fFontSize = $fStartSize
-	Local $aSize
+    Local $fFontSize = $fStartSize
+    Local $aSize
 
-	While $fFontSize > 4
-		$aSize = _UC_GetTextSize($sText, $sFont, $fFontSize, $iFontStyle)
+    While $fFontSize > 4
+        $aSize = _UC_GetTextSize($sText, $sFont, $fFontSize, $iFontStyle)
 
-		; Check if width or height exceeds the limits
-		If $aSize[0] > $iMaxWidth Or $aSize[1] > $iMaxHeight Then
-			$fFontSize -= 0.5 ; Decrease font size and try again
-		Else
-			ExitLoop ; It fits!
-		EndIf
-	WEnd
-	Return $fFontSize
-EndFunc   ;==>_UC_GetFitFontSize
+        ; Check if width or height exceeds the limits
+        If $aSize[0] > $iMaxWidth Or $aSize[1] > $iMaxHeight Then
+            $fFontSize -= 0.5 ; Decrease font size and try again
+        Else
+            ExitLoop ; It fits!
+        EndIf
+    WEnd
+    Return $fFontSize
+EndFunc
 
 Func _UC_IsMouseOver($hWnd)
 	Local $tPoint = _WinAPI_GetMousePos()
 	Return (_WinAPI_WindowFromPoint($tPoint) = $hWnd)
 EndFunc   ;==>_UC_IsMouseOver
 
-Func _UC_SetState($idCtrl, $iState)
-	; Get the Control's Properties
-	Local $m = _UC_Properties($idCtrl)
-	If Not IsMap($m) Then Return SetError(1, 0, False)
-
-	; Apply the State (e.g. @SW_HIDE or @SW_SHOW) to the Control's internal GUI $m.UC_hWnd
-	Local $hCtrlWnd = MapExists($m, "UC_hWnd") ? $m.UC_hWnd : 0
-	If $hCtrlWnd Then GUISetState($iState, $hCtrlWnd)
-
-	; If we hide it, we instantly turn off its shadow
-	If $iState = @SW_HIDE Then
-		Local $hOverlayWnd = MapExists($m, "UC_Shadow_Overlay_hWnd") ? $m.UC_Shadow_Overlay_hWnd : 0
-		If WinExists($hOverlayWnd) Then
-			GUIDelete($hOverlayWnd)
-			$m.UC_Shadow_Overlay_hWnd = 0
-			_UC_Properties($idCtrl, $m, False)
-		EndIf
-	EndIf
-
-	Return True
-EndFunc   ;==>_UC_SetState
-#EndRegion ; ~~~~~~~~~~~~~ UC_Framework Generic API ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+#EndRegion ; ~~~~~~~~~~~~~ Generic UC API ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~

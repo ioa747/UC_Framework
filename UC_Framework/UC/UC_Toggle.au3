@@ -22,7 +22,6 @@ Func _UC_Toggle_Create($hParent, $iX, $iY, $iW, $iH, $iType = 0, $hOnCol = Defau
 	$m.UC_hParent = $hParent
 	$m.UC_Width = $iW
 	$m.UC_Height = $iH
-	$m.UC_Shadow = 1  ; 💡 1 = Shadow active, 0 = Inactive
 
 	; Registered Event Handlers
 	$m["UC_WM_" & $WM_LBUTTONDOWN] = "_WM_LBUTTONDOWN"
@@ -113,9 +112,6 @@ Func _UC_Toggle_Draw($hWnd, ByRef $m)
 	; Present to Screen
 	_GDIPlus_GraphicsDrawImageRect($hGraphics, $hBitmap, 0, 0, $iW, $iH)
 
-	; 💡AUTOMATED SHADOW ENGINE
-	If $m.UC_Shadow = 1 Then _UC_Shadow_Overlay($m.UC_ControlID, 150, 10, True, -1)
-
 	; Cleanup
 	_GDIPlus_PenDispose($hPenHotTrack)
 	_GDIPlus_BrushDispose($hBrushBg)
@@ -169,12 +165,25 @@ EndFunc   ;==>_UC_Toggle_WM_LBUTTONUP
 
 Func _UC_Toggle_WM_MOUSEMOVE($idDummy, $hWnd, $iX, $iY)
 	#forceref $hWnd, $iX, $iY
+	Static $sFlag = 0
 	Local $m = _UC_Properties($idDummy, Default, Default, "UC_Toggle.au3")
-	__DW("_UC_Toggle_WM_MOUSEMOVE :: $idDummy=" & $idDummy & " :: $m.State=" & $m.State & @CRLF, 1, ">> UC_Toggle.au3")
+	__DW("_UC_Toggle_WM_MOUSEMOVE :: $idDummy=" & $idDummy & " :: $m.State=" & $m.State & " :: $sFlag=" & $sFlag & @CRLF, 1, ">> UC_Toggle.au3")
+
+	If Not MapExists($m, "State") Then Return 1 = __DW("_UC_Toggle_WM_MOUSEMOVE :: Not Map Exists $m.State" & @CRLF, 1, "!! UC_Toggle.au3")
+
+	; 🚧
+	If $sFlag = $idDummy & "-" & $m.State Then    ; 🚧 as new flag e.g. '4-2'
+		__DW("_UC_Toggle_WM_MOUSEMOVE :: $sFlag=" & $sFlag & " => Return" & @CRLF, 1, "-> UC_Toggle.au3")
+		Return
+	EndIf
 
 	If $m.State = 0 Then Return ; If is Disabled
 	If $m.State = 1 Then ; If is normal
 		$m.State = 2 ; Hover
+
+		__DW('_UC_Toggle_WM_MOUSEMOVE :: -> New $sFlag from:' & $sFlag & "  to:" & $idDummy & "-" & $m.State & @CRLF, 1, "--> UC_Toggle.au3")
+
+		$sFlag = $idDummy & "-" & $m.State    ; 🚧
 		_UC_Properties($idDummy, $m, Default, "UC_Toggle.au3")
 	EndIf
 EndFunc   ;==>_UC_Toggle_WM_MOUSEMOVE

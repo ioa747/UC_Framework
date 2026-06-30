@@ -1,4 +1,5 @@
-#include-once ; UC_Frame_Timers.au3
+; UC_Frame_Timers.au3
+#include-once
 
 #include "UC_Frame.au3"
 

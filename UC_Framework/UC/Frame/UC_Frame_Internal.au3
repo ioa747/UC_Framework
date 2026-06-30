@@ -1,4 +1,5 @@
-#include-once ; UC_Frame_Internal.au3
+; UC_Frame_Internal.au3
+#include-once
 
 #include "UC_Frame.au3"
 
@@ -78,34 +79,27 @@ EndFunc   ;==>__UC_Framework_Init
 Func __UC_Main_MsgHandler($hWnd, $iMsg, $wParam, $lParam)
 	#forceref $wParam
 	Local Static $hLastChild = 0, $hToolTipGUI = _UC_Properties(1, "UC_ToolTip_hWnd", Default, "UC_Frame_Internal.au3")
-	Local Static $sFilterFlag = "" ; Central filter to avoid unnecessary redraws/calls
 
 	If $hToolTipGUI = $hWnd Then Return $GUI_RUNDEFMSG
 
-	; First we check if the previous control needs "Reset" from Hover State
+	; First we check if the previous control needs "Reset"
 	; This must be done regardless of whether $hWnd is a UC control or not.
 	If $hLastChild And $hLastChild <> $hWnd Then
 		Local $idLast = Int(_WinAPI_GetProp($hLastChild, "UC_ControlID"))
 		If $idLast Then
 			Local $mLast = _UC_Properties($idLast, Default, Default, "UC_Frame_Internal.au3")
 
-			; Reset if the State is Hover (2)
-			If $mLast.State = 2 Then
+			; Only if it is not already Normal or Disabled
+			If $mLast.State <> 1 Then
 				_UC_ToolTip("")
-				__DW("__UC_Main_MsgHandler :: previous control :: ID:" & Int($idLast) & " > from State: 2 To: 1" & @CRLF, 1, "->> UC_Frame_Internal.au3")
-				$mLast.State = 1
-				_UC_Properties($idLast, $mLast, Default, "UC_Frame_Internal.au3")
-				; 🚧 Once a control is reset, we clean the filter
-				; to be ready to accept hover again
-				$sFilterFlag = ""
-				$hLastChild = 0
-			ElseIf $mLast.State <> 3 Then
-				; 🚧 If it is not in Dragging (3), reset $hLastChild to zero.
-				$hLastChild = 0
+				If Not ($mLast.State == 0) Then
+					__DW("__UC_Main_MsgHandler :: previous control :: ID:" & Int($idLast) & " > from State: " & $mLast.State & " To: 1" & @CRLF, 1, "->> UC_Frame_Internal.au3")
+					$mLast.State = 1
+					_UC_Properties($idLast, $mLast, Default, "UC_Frame_Internal.au3")
+				EndIf
 			EndIf
-		Else
-			$hLastChild = 0
 		EndIf
+		$hLastChild = 0
 	EndIf
 
 	; Now we check the current window
@@ -119,7 +113,7 @@ Func __UC_Main_MsgHandler($hWnd, $iMsg, $wParam, $lParam)
 
 	Switch $iMsg
 		Case $WM_PAINT
-			__DW("__UC_Main_MsgHandler -> Case $WM_PAINT <-" & @CRLF, 1, "<- UC_Frame_Internal.au3")
+			__DW("__UC_Main_MsgHandler ->> Case $WM_PAINT <<-" & @CRLF, 1, "<<- UC_Frame_Internal.au3")
 			_UC_Redraw($hWnd)
 			Local $tPAINTSTRUCT = DllStructCreate($tagPAINTSTRUCT)
 			_WinAPI_BeginPaint($hWnd, $tPAINTSTRUCT)
@@ -133,29 +127,10 @@ Func __UC_Main_MsgHandler($hWnd, $iMsg, $wParam, $lParam)
 			Return 0
 
 		Case $WM_MOUSEMOVE
-			Local $iState = _UC_Properties($idDummy, "State", Default, "UC_Frame_Internal.au3")
-
-			; 🚧 EXCEPTION: If State is 3 (Pressed/Dragging), we DO NOT filter MOUSEMOVE
-			If $iState <> 3 Then
-				; Check: If the control is already in this State, Return
-				If $sFilterFlag = $idDummy & "-" & $iState Then
-					__DW("__UC_Main_MsgHandler :: <<-  Return <<- :: $sFilterFlag=" & $sFilterFlag & @CRLF, 1, "<<- UC_Frame_Internal.au3")
-					Return 0
-				EndIf
-			EndIf
-
-			; If it is not filtered, we proceed to normal execution
 			__UC_CallControlFunc($iMsg, $idDummy, $hWnd, $iX, $iY)
-
 			$hLastChild = $hWnd
 			_UC_Properties(1, "UC_ActiveControlID", Int($idDummy), "UC_Frame_Internal.au3")
 			_UC_Properties(1, "UC_ActiveControlType", Int($iCtrlType), "UC_Frame_Internal.au3")
-
-			; We update the central flag with the NEW state (after CallControlFunc changed the State to Hover)
-			$iState = _UC_Properties($idDummy, "State", Default, "UC_Frame_Internal.au3")
-			$sFilterFlag = $idDummy & "-" & $iState
-			__DW("__UC_Main_MsgHandler :: $sFilterFlag=" & $sFilterFlag & @CRLF, 1, "->>- UC_Frame_Internal.au3")
-
 			Return 0
 
 		Case $WM_SETFOCUS
@@ -174,7 +149,7 @@ Func __UC_Main_MsgHandler($hWnd, $iMsg, $wParam, $lParam)
 	EndSwitch
 
 	Return $GUI_RUNDEFMSG
-EndFunc   ;==>__UC_Main_MsgHandler
+EndFunc   ;==>__UC_Main_MsgHandler00
 
 Func __UC_CallControlFunc($iMsg, $id, $hWnd, $iX, $iY)
 	Local $m = _UC_Properties($id, Default, Default, "UC_Frame_Internal.au3")
@@ -191,8 +166,7 @@ Func __UC_CallControlFunc($iMsg, $id, $hWnd, $iX, $iY)
 
 		; Error Handling
 		If @error = 0xDEAD And @extended = 0xBEEF Then
-			; 🚧 ConsoleWrite or __DW ??
-			ConsoleWrite("!Error __UC_CallControlFunc: Registered event " & $sEventName & " but function (or parameter) " & $sFuncName & " is missing. " & @CRLF)
+			If $g_UC_DebugInfo Then __DW("!Error: Registered event " & $sEventName & " but function " & $sFuncName & " missing.")
 			Return SetError(1, 0, False)
 		EndIf
 		Return $vRet
@@ -234,39 +208,39 @@ EndFunc   ;==>__DW
 
 #Region ; ~~~~~~~~~~~~~ UC_Themes Functions for Theme Management ~~~~~~~~~~~~~~~~~
 Func _UC_CreateDefaultIni($sIniPath)
-	Local $sTxt = ""
-	$sTxt &= "[ThemeConfig]" & @CRLF
-	$sTxt &= "Default=auto" & @CRLF
-	$sTxt &= "DefaultLight= Light" & @CRLF
-	$sTxt &= "DefaultDark=Dark" & @CRLF
-	$sTxt &= "[Light]" & @CRLF
-	$sTxt &= "Themes_Name=Light" & @CRLF
-	$sTxt &= "Themes_IsLightColor=1" & @CRLF
-	$sTxt &= "Themes_Workspace=0x758184" & @CRLF
-	$sTxt &= "Themes_Accent=0x388692" & @CRLF
-	$sTxt &= "Surface_Face=0xF0F0F0" & @CRLF
-	$sTxt &= "Surface_Hot=0x0066CC" & @CRLF
-	$sTxt &= "Surface_Border=0xABABAB" & @CRLF
-	$sTxt &= "Surface_Disabled=0xCCCCCC" & @CRLF
-	$sTxt &= "Text_Disabled=0x888888" & @CRLF
-	$sTxt &= "Text_fore=0x000000" & @CRLF
-	$sTxt &= "Text_Back=0xFFFFFF" & @CRLF
-	$sTxt &= "Fonts_Name=Segoe UI" & @CRLF
-	$sTxt &= "Fonts_Size=9" & @CRLF
-	$sTxt &= "[Dark]" & @CRLF
-	$sTxt &= "Themes_Name=Dark" & @CRLF
-	$sTxt &= "Themes_IsLightColor=0" & @CRLF
-	$sTxt &= "Themes_Workspace=0x758184" & @CRLF
-	$sTxt &= "Themes_Accent=0x388692" & @CRLF
-	$sTxt &= "Surface_Face=0x2D2D2D" & @CRLF
-	$sTxt &= "Surface_Hot=0x3399FF" & @CRLF
-	$sTxt &= "Surface_Border=0xABABAB" & @CRLF
-	$sTxt &= "Surface_Disabled=0xCCCCCC" & @CRLF
-	$sTxt &= "Text_Disabled=0x888888" & @CRLF
-	$sTxt &= "Text_fore=0xFFFFFF" & @CRLF
-	$sTxt &= "Text_Back=0x1E1E1E" & @CRLF
-	$sTxt &= "Fonts_Name=Segoe UI" & @CRLF
-	$sTxt &= "Fonts_Size=9"
+    Local $sTxt = ""
+    $sTxt &= "[ThemeConfig]" & @CRLF
+    $sTxt &= "Default=auto" & @CRLF
+    $sTxt &= "DefaultLight= Light" & @CRLF
+    $sTxt &= "DefaultDark=Dark" & @CRLF
+    $sTxt &= "[Light]" & @CRLF
+    $sTxt &= "Themes_Name=Light" & @CRLF
+    $sTxt &= "Themes_IsLightColor=1" & @CRLF
+    $sTxt &= "Themes_Workspace=0x758184" & @CRLF
+    $sTxt &= "Themes_Accent=0x388692" & @CRLF
+    $sTxt &= "Surface_Face=0xF0F0F0" & @CRLF
+    $sTxt &= "Surface_Hot=0x0066CC" & @CRLF
+    $sTxt &= "Surface_Border=0xABABAB" & @CRLF
+    $sTxt &= "Surface_Disabled=0xD8D8D8" & @CRLF
+    $sTxt &= "Text_fore=0x000000" & @CRLF
+    $sTxt &= "Text_Back=0xFFFFFF" & @CRLF
+    $sTxt &= "Fonts_Name=Segoe UI" & @CRLF
+    $sTxt &= "Fonts_Size=9" & @CRLF
+    $sTxt &= "Fonts_Weight=400" & @CRLF
+    $sTxt &= "[Dark]" & @CRLF
+    $sTxt &= "Themes_Name=Dark" & @CRLF
+    $sTxt &= "Themes_IsLightColor=0" & @CRLF
+    $sTxt &= "Themes_Workspace=0x758184" & @CRLF
+    $sTxt &= "Themes_Accent=0x388692" & @CRLF
+    $sTxt &= "Surface_Face=0x2D2D2D" & @CRLF
+    $sTxt &= "Surface_Hot=0x3399FF" & @CRLF
+    $sTxt &= "Surface_Border=0x454545" & @CRLF
+    $sTxt &= "Surface_Disabled=0x8D8D8D" & @CRLF
+    $sTxt &= "Text_fore=0xFFFFFF" & @CRLF
+    $sTxt &= "Text_Back=0x1E1E1E" & @CRLF
+    $sTxt &= "Fonts_Name=Segoe UI" & @CRLF
+    $sTxt &= "Fonts_Size=9" & @CRLF
+    $sTxt &= "Fonts_Weight=400"
 
 	FileWrite($sIniPath, $sTxt)
 EndFunc   ;==>_UC_CreateDefaultIni
@@ -291,6 +265,7 @@ Func _UC_Themes($sTheme = Default, $vName = Default, $vVal = Default)
 
 		Case IsMap($vName)
 			$mTheme[$sTheme] = $vName ; SET MAP
+;~ 			If $vVal = Default And MapExists($vName, "UC_hWnd") Then _UC_Redraw($vName.UC_hWnd)
 			Return 1
 
 		Case Else
@@ -303,11 +278,13 @@ Func _UC_Themes($sTheme = Default, $vName = Default, $vVal = Default)
 			Else ; SET Val
 				If $vName = "@Delete" Then
 					$mTheme[$sTheme] = ""
+;~ 					If $vVal = Default Then _UC_Redraw($m.UC_hWnd)
 					Return 1
 				EndIf
 
 				$m[$vName] = $vVal
 				$mTheme[$sTheme] = $m
+;~ 				_UC_Redraw($m.UC_hWnd)
 				Return 1
 			EndIf
 	EndSelect
@@ -315,7 +292,7 @@ EndFunc   ;==>_UC_Themes
 
 Func _UC_Theme_Switch($sNewThemeName)
 	_UC_Themes("Active", _UC_Themes($sNewThemeName))
-;~ 	_UC_Resource_Cleanup()
-;~  _UC_Redraw_All()
+;~ 	_UC_Resource_Cleanup() ; Αδειάζει τα παλιά Brushes/Pens από το pool
+;~     _UC_Redraw_All() ; Ενημέρωση όλου του GUI
 EndFunc   ;==>_UC_Theme_Switch
 #EndRegion ; ~~~~~~~~~~~~~ UC_Themes Functions for Theme Management ~~~~~~~~~~~~~~~~~

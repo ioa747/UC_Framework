@@ -75,6 +75,5 @@ Global Const $aUC_Types[] = [ _
 #include "UC_Frame_GDI.au3"
 #include "UC_Frame_WinAPI.au3"
 #include "UC_Frame_Timers.au3"
-#include "UC_Frame_Shadow.au3"
 #EndRegion ; ~~~ UC_Frame_...  UDF ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 

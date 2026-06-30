@@ -105,8 +105,8 @@ Func _Main()
     ; =================================================================
 
     ; === Timer ===
-;~     _UC_Timer_Set($idImage3, 100, "_CallBackTimerFunction")
-;~     _UC_Timer_Set($btnRound2, 500, "_CallBackTimerFlash")
+    _UC_Timer_Set($idImage3, 100, "_CallBackTimerFunction")
+    _UC_Timer_Set($btnRound2, 500, "_CallBackTimerFlash")
 
     Local $id_UP = GUICtrlCreateDummy()
     Local $id_DOWN = GUICtrlCreateDummy()
@@ -145,7 +145,7 @@ Func _Main()
                 Local $iTxtColor, $iBkColor
 
                 If GUICtrlRead($idToggleTheme) Then
-					$iBkColor = 0x3F4647
+					$iBkColor = 0x262A2B
                     $iTxtColor = 0xFFFFFF
                 Else
 					$iBkColor = 0xF0F0F0
@@ -168,8 +168,8 @@ Func _Main()
 				_WinAPI_LockWindowUpdate(0)
 
             Case $idToggle1
-                ConsoleWrite("$idToggle1:" & GUICtrlRead($idToggle1) & @CRLF)
-				_UC_SetState($idToggle2, (GUICtrlRead($idToggle1) ? @SW_HIDE : @SW_SHOW))
+				ConsoleWrite("$idToggle1:" & GUICtrlRead($idToggle1) & @CRLF)
+                GUISetState((GUICtrlRead($idToggle1) ? @SW_HIDE : @SW_SHOW), _UC_Get($idToggle2, "UC_hWnd"))
 
             Case $idToggle2
                 ConsoleWrite("$idToggle2:" & GUICtrlRead($idToggle2) & @CRLF)

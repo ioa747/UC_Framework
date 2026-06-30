@@ -1,4 +1,6 @@
-#include-once ; UC_Frame_WinAPI.au3
+; UC_Frame_WinAPI.au3
+#include-once
+
 
 #Region ; ~~~~~~~~~~~~~ UC_Framework Functions for Window Properties (WinAPI) ~~~~~~~~~
 Func _WinAPI_SetProp($hWnd, $sName, $iVal)
