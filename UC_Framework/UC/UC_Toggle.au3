@@ -165,26 +165,13 @@ EndFunc   ;==>_UC_Toggle_WM_LBUTTONUP
 
 Func _UC_Toggle_WM_MOUSEMOVE($idDummy, $hWnd, $iX, $iY)
 	#forceref $hWnd, $iX, $iY
-	Static $sFlag = 0
 	Local $m = _UC_Properties($idDummy, Default, Default, "UC_Toggle.au3")
-	__DW("_UC_Toggle_WM_MOUSEMOVE :: $idDummy=" & $idDummy & " :: $m.State=" & $m.State & " :: $sFlag=" & $sFlag & @CRLF, 1, ">> UC_Toggle.au3")
-
-	If Not MapExists($m, "State") Then Return 1 = __DW("_UC_Toggle_WM_MOUSEMOVE :: Not Map Exists $m.State" & @CRLF, 1, "!! UC_Toggle.au3")
-
-	; 🚧
-	If $sFlag = $idDummy & "-" & $m.State Then    ; 🚧 as new flag e.g. '4-2'
-		__DW("_UC_Toggle_WM_MOUSEMOVE :: $sFlag=" & $sFlag & " => Return" & @CRLF, 1, "-> UC_Toggle.au3")
-		Return
-	EndIf
+	__DW("_UC_Toggle_WM_MOUSEMOVE :: $idDummy=" & $idDummy & " :: $m.State=" & $m.State & @CRLF, 1, ">> UC_Toggle.au3")
 
 	If $m.State = 0 Then Return ; If is Disabled
-	If $m.State = 1 Then ; If is normal
-		$m.State = 2 ; Hover
-
-		__DW('_UC_Toggle_WM_MOUSEMOVE :: -> New $sFlag from:' & $sFlag & "  to:" & $idDummy & "-" & $m.State & @CRLF, 1, "--> UC_Toggle.au3")
-
-		$sFlag = $idDummy & "-" & $m.State    ; 🚧
-		_UC_Properties($idDummy, $m, Default, "UC_Toggle.au3")
+	If $m.State = 1 Then ; If is normal -> Go to Hover
+		$m.State = 2
+		_UC_Properties($idDummy, $m, Default, "UC_Toggle.au3") ; This triggers the redraw for Hover state
 	EndIf
 EndFunc   ;==>_UC_Toggle_WM_MOUSEMOVE
 

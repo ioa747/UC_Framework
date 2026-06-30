@@ -2,7 +2,7 @@
 ;----------------------------------------------------------------------------------------
 ; Title...........: Example1.au3
 ; Description.....: Example of using the UC_Framework.au3
-; AutoIt Version..: 3.3.18.0   Author: ioa747           Script Version: 0.0.12.0
+; AutoIt Version..: 3.3.18.0   Author: ioa747           Script Version: 0.0.14.0
 ; Note............: Testet in Windows 11 Pro 25H2       Date:22/05/2026
 ; Link............: https://github.com/ioa747/UC_Framework
 ;----------------------------------------------------------------------------------------
@@ -152,20 +152,12 @@ Func _Main()
                     $iTxtColor = 0x000000
                 EndIf
 
-				_WinAPI_LockWindowUpdate($hMainGui)
-
 				_UC_GUISetBkColor($iBkColor, $hMainGui)
 
                 GUICtrlSetColor($idLblTheme, $iTxtColor)
                 GUICtrlSetColor($idHLabel, $iTxtColor)
-;~              _UC_Set($idVLabel, "Color", $iTxtColor)
-
-;~ 				_UC_Set($idHourMinute, "BoxColor", $iBkColor)
-;~ 				_UC_Set($idHourMinute, "TextColor", $iTxtColor)
 
                 _UC_Refresh($hMainGui)
-
-				_WinAPI_LockWindowUpdate(0)
 
             Case $idToggle1
 				ConsoleWrite("$idToggle1:" & GUICtrlRead($idToggle1) & @CRLF)

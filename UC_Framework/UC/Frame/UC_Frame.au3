@@ -2,7 +2,7 @@
 ;----------------------------------------------------------------------------------------
 ; Title...........: UC_Frame.au3
 ; Description.....: Native AutoIt UDF, UC_Frame_[UDF], Global variable\constant for the UC_Framework
-; AutoIt Version..: 3.3.18.0   Author: ioa747           Script Version: 0.0.12.0
+; AutoIt Version..: 3.3.18.0   Author: ioa747           Script Version: 0.0.14.0
 ; Note............: Testet in Windows 11 Pro 25H2       Date:22/05/2026
 ; Link............: https://github.com/ioa747/UC_Framework
 ;----------------------------------------------------------------------------------------
@@ -44,7 +44,6 @@ Global Enum _
         $UC_TYPE_DATEPICKER, _
         $UC_TYPE_CALENDAR, _
 		$UC_TYPE_STEPPER, _
-		$UC_TYPE_NEO, _
         $UC_TYPE_MAX
 
 Global Const $aUC_Types[] = [ _
@@ -63,8 +62,7 @@ Global Const $aUC_Types[] = [ _
         "Chart_Bar", _      ; $UC_TYPE_CHART_BAR
         "DatePicker", _     ; $UC_TYPE_DATEPICKER
         "Calendar", _       ; $UC_TYPE_CALENDAR
-		"Stepper", _        ; $UC_TYPE_STEPPER
-		"Neo" _             ; $UC_TYPE_NEO
+		"Stepper" _        ; $UC_TYPE_STEPPER
         ]
 
 #EndRegion ; ~~~ Global  variable\constant ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
